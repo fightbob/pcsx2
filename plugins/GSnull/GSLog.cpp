@@ -67,8 +67,7 @@ void Log(char* fmt, ...)
 {
     va_list list;
 
-    if (!conf.Log || gsLog == NULL)
-        return;
+    if (!conf.Log || gsLog == NULL) return;
 
     va_start(list, fmt);
     vfprintf(gsLog, fmt, list);
