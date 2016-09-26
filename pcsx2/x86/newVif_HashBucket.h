@@ -16,6 +16,7 @@
 #include "x86emitter/x86_intrin.h"
 #pragma once
 
+
 // Create some typecast operators for SIMD operations.  For some reason MSVC needs a
 // handle/reference typecast to avoid error.  GCC (and presumably other compilers)
 // generate an error if the handle/ref is used.  Honestly neither makes sense, since
@@ -62,6 +63,7 @@ public:
 		return mBucket[data % hSize].Size;
 	}
 	__fi T* find(T* dataPtr) {
+#if 0
 		u32 d = *((u32*)dataPtr);
 		const SizeChain<T>& bucket( mBucket[d % hSize] );
 
@@ -82,6 +84,7 @@ public:
 
 		}
 		if( bucket.Size > 3 ) DevCon.Warning( "recVifUnpk: Bucket 0x%04x has %d micro-programs", d % hSize, bucket.Size );
+#endif
 		return NULL;
 	}
 	__fi void add(const T& dataPtr) {

@@ -18,6 +18,10 @@
 #include "internal.h"
 #include "x86_intrin.h"
 
+#define cpuid()
+#define cpuid(n)
+#define cpuid(a,b)
+
 using namespace x86Emitter;
 
 __aligned16 x86capabilities x86caps;
@@ -65,7 +69,7 @@ void x86capabilities::SIMD_EstablishMXCSRmask()
 	__aligned16 u8 targetFXSAVE[512];
 
 	// Work for recent enough GCC/CLANG/MSVC 2012
-	_fxsave(&targetFXSAVE);
+	//_fxsave(&targetFXSAVE);
 
 	u32 result;
 	memcpy(&result, &targetFXSAVE[28], 4); // bytes 28->32 are the MXCSR_Mask.
@@ -89,7 +93,7 @@ s64 x86capabilities::_CPUSpeedHz( u64 time ) const
 	SingleCoreAffinity affinity_lock;
 
 	// Align the cpu execution to a cpuTick boundary.
-
+#if 0
 	// GCC 4.8 has __rdtsc but apparently it causes a crash. Only known working on MSVC
 	do {
 		timeStart = GetCPUTicks();
@@ -116,7 +120,7 @@ s64 x86capabilities::_CPUSpeedHz( u64 time ) const
 		__asm__ __volatile__("rdtsc" : "=A"(endCycle));
 #endif
 	} while( ( timeStop - timeStart ) < time );
-
+#endif
 	s64 cycleCount = endCycle - startCycle;
 	s64 timeCount = timeStop - timeStart;
 	s64 overrun = timeCount - time;
@@ -228,7 +232,7 @@ void x86capabilities::Identify()
 	if ( cmds >= 0x00000007 )
 	{
 		// Note: ECX must be 0 for AVX2 detection.
-		cpuidex( regs, 0x00000007, 0 );
+//		cpuidex( regs, 0x00000007, 0 );
 
 		SEFlag = regs[ 1 ];
 	}
@@ -291,7 +295,7 @@ void x86capabilities::Identify()
 
 	if((Flags2 >> 27) & 1) // OSXSAVE
 	{
-		if((_xgetbv(0) & 6) == 6) // XFEATURE_ENABLED_MASK[2:1] = '11b' (XMM state and YMM state are enabled by OS).
+		if((0 & 6) == 6) // XFEATURE_ENABLED_MASK[2:1] = '11b' (XMM state and YMM state are enabled by OS).
 		{
 			hasAVX								= ( Flags2 >> 28 ) & 1; //avx
 			hasFMA								= ( Flags2 >> 12 ) & 1; //fma

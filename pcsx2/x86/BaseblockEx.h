@@ -245,5 +245,5 @@ static void recLUT_SetPage(uptr reclut[0x10000], uptr hwlut[0x10000],
 #if defined(_M_X86_64)
 static_assert( sizeof(BASEBLOCK) == 8, "BASEBLOCK is not 8 bytes" );
 #else
-static_assert( sizeof(BASEBLOCK) == 4, "BASEBLOCK is not 4 bytes" );
+//static_assert( sizeof(BASEBLOCK) == 4, "BASEBLOCK is not 4 bytes" );
 #endif

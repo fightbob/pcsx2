@@ -1,3 +1,5 @@
+#if(NOT ${PCSX2_TARGET_ARCHITECTURES} MATCHES "aarch64")
+
 # Check that people use the good file
 if(NOT TOP_CMAKE_WAS_SOURCED)
     message(FATAL_ERROR "
@@ -66,4 +68,7 @@ set(x86emitterFinalLibs
 	${wxWidgets_LIBRARIES}
 )
 
+
 add_pcsx2_lib(${Output} "${x86emitterFinalSources}" "${x86emitterFinalLibs}" "${x86emitterFinalFlags}")
+
+#endif()

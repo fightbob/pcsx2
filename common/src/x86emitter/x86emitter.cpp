@@ -588,7 +588,7 @@ xAddressVoid::xAddressVoid( const void* displacement )
 	pxAssert(0);
 	//Displacement = (s32)displacement;
 #else
-	Displacement = (s32)displacement;
+//	Displacement = (s32)displacement;
 #endif
 }
 

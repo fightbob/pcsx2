@@ -31,8 +31,9 @@
 # "There are many more known variants/revisions that we do not handle/detect."
 
 set(archdetect_c_code "
-#if defined(__arm__) || defined(__TARGET_ARCH_ARM)
-    #if defined(__ARM_ARCH_7__) \\
+    #if defined(__aarch64__) || defined(__ARM_ARCH_8__) || defined(__arm64__) || defined(__ARM_ARCH_8__) || defined(__ARM_ARCH_8A__) 
+        #error cmake_ARCH aarch64
+    #elif defined(__ARM_ARCH_7__) \\
         || defined(__ARM_ARCH_7A__) \\
         || defined(__ARM_ARCH_7R__) \\
         || defined(__ARM_ARCH_7M__) \\
@@ -50,9 +51,6 @@ set(archdetect_c_code "
     #elif defined(__ARM_ARCH_5TEJ__) \\
         || (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM-0 >= 5)
         #error cmake_ARCH armv5
-    #else
-        #error cmake_ARCH arm
-    #endif
 #elif defined(__i386) || defined(__i386__) || defined(_M_IX86)
     #error cmake_ARCH i386
 #elif defined(__x86_64) || defined(__x86_64__) || defined(__amd64) || defined(_M_X64)

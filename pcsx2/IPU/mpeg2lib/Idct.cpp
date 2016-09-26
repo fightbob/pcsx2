@@ -157,6 +157,7 @@ static __fi void idct_col (s16 * const block)
 
 __ri void mpeg2_idct_copy(s16 * block, u8 * dest, const int stride)
 {
+#if 0
     int i;
 
     for (i = 0; i < 8; i++)
@@ -180,12 +181,14 @@ __ri void mpeg2_idct_copy(s16 * block, u8 * dest, const int stride)
 		dest += stride;
 		block += 8;
     } while (--i);
+#endif
 }
 
 
 // stride = increment for dest in 16-bit units (typically either 8 [128 bits] or 16 [256 bits]).
 __ri void mpeg2_idct_add (const int last, s16 * block, s16 * dest, const int stride)
 {
+#if 0
 	// on the IPU, stride is always assured to be multiples of QWC (bottom 3 bits are 0).
 
     if (last != 129 || (block[0] & 7) == 4)
@@ -217,6 +220,7 @@ __ri void mpeg2_idct_add (const int last, s16 * block, s16 * dest, const int str
 		for(int i=0; i<8; ++i)
 			_mm_store_ps((float*)(dest+(stride*i)), dc128);
     }
+#endif
 }
 
 mpeg2_scan_pack::mpeg2_scan_pack()

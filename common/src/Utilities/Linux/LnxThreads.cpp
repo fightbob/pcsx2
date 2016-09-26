@@ -48,7 +48,7 @@ __forceinline void Threading::SpinWait()
 {
 	// If this doesn't compile you can just comment it out (it only serves as a
 	// performance hint and isn't required).
-	__asm__ ( "pause" );
+//	__asm__ ( "pause" );
 }
 
 __forceinline void Threading::EnableHiresScheduler()

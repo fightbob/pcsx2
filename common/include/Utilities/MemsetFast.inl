@@ -15,10 +15,15 @@
 
 #pragma once
 
-#include <xmmintrin.h>
+//#include <xmmintrin.h>
 
 #define StoreDestIdx(idx) case idx: _mm_store_ps(&destxmm[idx-1][0], srcreg)
- 
+
+ template< u8 data >
+__noinline void memset_sse_a( void* dest, const size_t size )
+{
+}
+#if 0
  template< u8 data >
 __noinline void memset_sse_a( void* dest, const size_t size )
 {
@@ -62,7 +67,7 @@ __noinline void memset_sse_a( void* dest, const size_t size )
 		_mm_store_ps(&destxmm[7][0], srcreg);
 	}
 };
-
+#endif
 static __fi void memzero_sse_a( void* dest, const size_t size )
 {
 	memset_sse_a<0>( dest, size );

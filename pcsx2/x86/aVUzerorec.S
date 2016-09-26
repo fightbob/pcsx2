@@ -28,7 +28,7 @@
 #endif
 
         
-.intel_syntax noprefix
+//.intel_syntax noprefix
 .extern s_TotalVUCycles
 .extern s_callstack
 .extern s_vu1esp
@@ -43,6 +43,7 @@
 // SuperVUExecuteProgram(u32 startpc, int vuindex)
 .globl SuperVUExecuteProgram
 SuperVUExecuteProgram:
+#if 0
         mov eax, [esp]
         mov dword ptr s_TotalVUCycles, 0
         add esp, 4
@@ -59,11 +60,12 @@ SuperVUExecuteProgram:
         mov dword ptr s_writeQ, 0xffffffff
         mov dword ptr s_writeP, 0xffffffff
         jmp eax
-
+#endif
 .globl SuperVUEndProgram
 SuperVUEndProgram:
     // restore cpu state
-    ldmxcsr g_sseMXCSR
+#if 0    
+ldmxcsr g_sseMXCSR
         mov esi, s_vu1esi
         mov edi, s_vuedi
         mov ebx, s_vuebx
@@ -72,7 +74,7 @@ SuperVUEndProgram:
 
         call SuperVUCleanupProgram
         jmp [s_callstack] // so returns correctly
-
+#endif
 #if defined(__POSIX__) && defined(__ELF__)
 .section .note.GNU-stack,"",%progbits
 #endif

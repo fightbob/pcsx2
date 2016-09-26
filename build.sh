@@ -22,7 +22,7 @@ cleanBuild=0
 useClang=0
 useIcc=0
 # 0 => no, 1 => yes, 2 => force yes
-useCross=2
+useCross=0
 CoverityBuild=0
 cppcheck=0
 clangTidy=0
@@ -45,8 +45,12 @@ if [ "$(uname -s)" = 'Darwin' ]; then
         toolfile=cmake/darwin13-compiler-i386-clang.cmake
     fi
 else
-    ncpu=$(grep -w -c processor /proc/cpuinfo)
-    toolfile=cmake/linux-compiler-i386-multilib.cmake
+    ncpu=5
+    if [ "$(uname -p)" = "aarch64" ]; then
+        toolfile=cmake/linux-compiler-aarch64-multilib.cmake
+    else
+        toolfile=cmake/linux-compiler-i386-multilib.cmake
+    fi
 fi
 
 if command -v ninja >/dev/null ; then

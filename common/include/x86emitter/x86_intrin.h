@@ -21,7 +21,7 @@
 // Yes there are several files for the same features!
 // x86intrin.h which is the general include provided by the compiler
 // x86_intrin.h, this file, which is compatibility layer for severals intrinsics
-#include "x86intrin.h"
+//#include "x86intrin.h"
 
 #else
 
@@ -37,8 +37,8 @@
 
 #else
 
-#include <cpuid.h>
-
+//#include <cpuid.h>
+#if 0
 static __inline__ __attribute__((always_inline)) void cpuidex(int CPUInfo[], const int InfoType, const int count) {
 	__cpuid_count(InfoType, count, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
 }
@@ -53,7 +53,7 @@ static __inline__ __attribute__((always_inline)) unsigned long long _xgetbv(unsi
 	__asm__ __volatile__("xgetbv" : "=a"(eax), "=d"(edx) : "c"(index));
 	return ((unsigned long long)edx << 32) | eax;
 }
-
+#endif
 #endif
 
 // Rotate instruction

@@ -29,17 +29,17 @@
 // be strictly 128-bit aligned).
 static __fi void CopyQWC( void* dest, const void* src )
 {
-	_mm_store_ps( (float*)dest, _mm_load_ps((const float*)src) );
+//	_mm_store_ps( (float*)dest, _mm_load_ps((const float*)src) );
 }
 
 static __fi void ZeroQWC( void* dest )
 {
-	_mm_store_ps( (float*)dest, _mm_setzero_ps() );
+//	_mm_store_ps( (float*)dest, _mm_setzero_ps() );
 }
 
 static __fi void ZeroQWC( u128& dest )
 {
-	_mm_store_ps( (float*)&dest, _mm_setzero_ps() );
+//	_mm_store_ps( (float*)&dest, _mm_setzero_ps() );
 }
 
 #define PSM(mem)	(vtlb_GetPhyPtr((mem)&0x1fffffff)) //pcsx2 is a competition.The one with most hacks wins :D

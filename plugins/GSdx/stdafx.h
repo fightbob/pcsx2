@@ -296,8 +296,8 @@ using namespace stdext;
 
 #if _M_SSE >= 0x200
 
-	#include <xmmintrin.h>
-	#include <emmintrin.h>
+	//#include <xmmintrin.h>
+	//#include <emmintrin.h>
 
 	#ifndef _MM_DENORMALS_ARE_ZERO
 	#define _MM_DENORMALS_ARE_ZERO 0x0040
@@ -325,19 +325,19 @@ using namespace stdext;
 
 #if _M_SSE >= 0x301
 
-	#include <tmmintrin.h>
+	//#include <tmmintrin.h>
 
 #endif
 
 #if _M_SSE >= 0x401
 
-	#include <smmintrin.h>
+	//#include <smmintrin.h>
 
 #endif
 
 #if _M_SSE >= 0x500
 
-	#include <immintrin.h>
+	//#include <immintrin.h>
 
 #endif
 
@@ -364,9 +364,9 @@ using namespace stdext;
 
 	__forceinline unsigned char _BitScanForward(unsigned long* const Index, const unsigned long Mask)
 	{
-		__asm__("bsfl %k[Mask], %k[Index]" : [Index] "=r" (*Index) : [Mask] "mr" (Mask));
+	//	__asm__("bsfl %k[Mask], %k[Index]" : [Index] "=r" (*Index) : [Mask] "mr" (Mask));
 		
-		return Mask ? 1 : 0;
+	//	return Mask ? 1 : 0;
 	}
 
 	#ifdef __GNUC__
@@ -377,15 +377,16 @@ using namespace stdext;
 	//__forceinline unsigned long long __rdtsc()
 	__forceinline unsigned long long _lnx_rdtsc()
 	{
-		#if defined(__amd64__) || defined(__x86_64__)
-		unsigned long long low, high;
-		__asm__ __volatile__("rdtsc" : "=a"(low), "=d"(high));
-		return low | (high << 32);
-		#else
-		unsigned long long retval;
-		__asm__ __volatile__("rdtsc" : "=A"(retval));
-		return retval;
-		#endif
+	//	#if defined(__amd64__) || defined(__x86_64__)
+	//	unsigned long long low, high;
+	//	__asm__ __volatile__("rdtsc" : "=a"(low), "=d"(high));
+	//	return low | (high << 32);
+	//	#else
+	//	unsigned long long retval;
+	//	__asm__ __volatile__("rdtsc" : "=A"(retval));
+	//	return retval;
+	//	#endif
+	return 0;
 	}
 
 	#endif

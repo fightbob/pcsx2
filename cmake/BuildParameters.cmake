@@ -177,6 +177,8 @@ if(${PCSX2_TARGET_ARCHITECTURES} MATCHES "x86_64" OR ${PCSX2_TARGET_ARCHITECTURE
         --cross-multilib passed to build.sh")
 	endif()
 	message(STATUS "Compiling a ${PCSX2_TARGET_ARCHITECTURES} build on a ${CMAKE_HOST_SYSTEM_PROCESSOR} host.")
+elseif(${PCSX2_TARGET_ARCHITECTURES} MATCHES "aarch64")
+	message(STATUS "compiling for aarch64...good luck")
 else()
 	message(FATAL_ERROR "Unsupported architecture: ${PCSX2_TARGET_ARCHITECTURES}")
 endif()
@@ -245,11 +247,13 @@ elseif(${PCSX2_TARGET_ARCHITECTURES} MATCHES "x86_64")
     set(_ARCH_64 1)
     set(_M_X86 1)
     set(_M_X86_64 1)
-else()
+elseif(${PCSX2_TARGET_ARCHITECTURES} MATCHES "aarch64")
     # All but i386 requires -fPIC
-    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    set(DISABLE_SVU TRUE)
 
-    message(FATAL_ERROR "Unsupported architecture: ${PCSX2_TARGET_ARCHITECTURES}")
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    add_definitions(-D__arm__=1 -D__aarch64__=1)
+
 endif()
 
 #-------------------------------------------------------------------------------
@@ -297,7 +301,7 @@ option(USE_LTO "Enable LTO optimization (will likely break the build)")
 
 # Note1: Builtin strcmp/memcmp was proved to be slower on Mesa than stdlib version.
 # Note2: float operation SSE is impacted by the PCSX2 SSE configuration. In particular, flush to zero denormal.
-set(COMMON_FLAG "-pipe -fvisibility=hidden -pthread -fno-builtin-strcmp -fno-builtin-memcmp -mfpmath=sse")
+set(COMMON_FLAG " -pipe -fvisibility=hidden -pthread " )
 if (DISABLE_SVU)
     set(COMMON_FLAG "${COMMON_FLAG} -DDISABLE_SVU")
 endif()

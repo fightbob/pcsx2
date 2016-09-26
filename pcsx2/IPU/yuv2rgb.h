@@ -17,5 +17,5 @@
 
 extern void yuv2rgb_reference();
 
-#define yuv2rgb yuv2rgb_sse2
+#define yuv2rgb yuv2rgb_reference
 extern void yuv2rgb_sse2();

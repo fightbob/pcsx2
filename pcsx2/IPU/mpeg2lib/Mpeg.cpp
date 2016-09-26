@@ -923,6 +923,7 @@ finish_idec:
 
 __fi bool mpeg2_slice()
 {
+#if 0
 	int DCT_offset, DCT_stride;
 
 	macroblock_8& mb8 = decoder.mb8;
@@ -1156,4 +1157,5 @@ __fi bool mpeg2_slice()
 	}
 
 	return true;
+#endif
 }

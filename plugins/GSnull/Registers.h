@@ -30,7 +30,7 @@ extern "C" {
 }
 #endif
 
-#include "emmintrin.h"
+//#include "emmintrin.h"
 
 #pragma pack(push, 1)
 
