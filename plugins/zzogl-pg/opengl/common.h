@@ -26,6 +26,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#undef ZEROGS_SSE2
+
 #if defined(WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__)
 #	define CONFIG_WIN32
 #endif

@@ -267,6 +267,7 @@ using namespace stdext;
 
 #endif
 
+#if 0
 // sse
 #if defined(__GNUC__) && !defined(__x86_64__)
 // Convert gcc see define into GSdx (windows) define
@@ -294,9 +295,14 @@ using namespace stdext;
 
 #endif
 
+#endif
+
+#define _M_SSE 0x200
+
+
 #if _M_SSE >= 0x200
 
-	//#include <xmmintrin.h>
+	#include <immintrin.h>
 	//#include <emmintrin.h>
 
 	#ifndef _MM_DENORMALS_ARE_ZERO

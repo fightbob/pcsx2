@@ -183,7 +183,10 @@ static void execI()
 
 
 	cpuBlockCycles += opcode.cycles;
-
+	static int a = 0;
+	a++;
+	if(a % 1000000 == 0)
+		DevCon.WriteLn(Color_Gray, "%08x",pc);
 	opcode.interpret();
 }
 

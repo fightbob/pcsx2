@@ -37,7 +37,7 @@ void hwInit()
 
 	if( hwInitialized ) return;
 
-	VifUnpackSSE_Init();
+//	VifUnpackSSE_Init();
 
 	hwInitialized = true;
 }
@@ -46,7 +46,7 @@ void hwShutdown()
 {
 	if (!hwInitialized) return;
 
-	VifUnpackSSE_Destroy();
+//	VifUnpackSSE_Destroy();
 
 	hwInitialized = false;
 }

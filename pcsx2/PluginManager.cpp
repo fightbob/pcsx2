@@ -1318,11 +1318,11 @@ void SysCorePlugins::Open( PluginsEnum_t pid )
 
 		jNO_DEFAULT;
 	}
-	if( !result )
-		throw Exception::PluginOpenError( pid );
+//	if( !result )
+//		throw Exception::PluginOpenError( pid );
 
 	ScopedLock lock( m_mtx_PluginStatus );
-	if( m_info[pid] ) m_info[pid]->IsOpened = true;
+//	if( m_info[pid] ) m_info[pid]->IsOpened = true;
 }
 
 void SysCorePlugins::Open()
