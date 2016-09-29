@@ -57,7 +57,7 @@ if command -v ninja >/dev/null ; then
     flags="$flags -GNinja"
     make=ninja
 else
-    make="make --jobs=$ncpu"
+  make="make --jobs=$ncpu"
 fi
 
 for ARG in "$@"; do
@@ -157,7 +157,7 @@ if [ "$useClang" -eq 1 ]; then
     if [ "$useCross" -eq 0 ]; then
         CC=clang CXX=clang++ cmake $flags "$root" 2>&1 | tee -a "$log"
     else
-        CC="clang -m32" CXX="clang++ -m32" cmake $flags "$root" 2>&1 | tee -a "$log"
+        CC="clang" CXX="clang++" cmake $flags "$root" 2>&1 | tee -a "$log"
     fi
 else
     if [ "$useIcc" -eq 1 ]; then
