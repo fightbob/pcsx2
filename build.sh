@@ -53,12 +53,12 @@ else
     fi
 fi
 
-if command -v ninja >/dev/null ; then
-    flags="$flags -GNinja"
-    make=ninja
-else
-  make="make --jobs=$ncpu"
-fi
+#if command -v ninja >/dev/null ; then
+#    flags="$flags -GNinja"
+#    make=ninja
+#else
+make="make --jobs=$ncpu"
+#fi
 
 for ARG in "$@"; do
     case "$ARG" in
