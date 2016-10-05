@@ -571,6 +571,47 @@ else()
     set(pcsx2SSources "")
 endif()
 
+# aarch64 sources
+set(pcsx2aarch64Sources
+	aarch64/BaseblockEx.cpp
+	aarch64/iCOP0.cpp
+	aarch64/iFPU.cpp
+	aarch64/iMMI.cpp
+	aarch64/iR3000Atables.cpp
+	aarch64/iR5900Misc.cpp
+	aarch64/ir5900tables.cpp
+	aarch64/iR5900Arit.cpp
+	aarch64/iR5900AritImm.cpp
+	aarch64/iR5900Branch.cpp
+	aarch64/iR5900Jump.cpp
+	aarch64/iR5900LoadStore.cpp
+	aarch64/iR5900Move.cpp
+	aarch64/iR5900MultDiv.cpp
+	aarch64/iR5900Shift.cpp
+	aarch64/recVTLB.cpp
+	aarch64/newVif_Unpack.cpp
+	aarch64/Arm64Emitter.cpp
+)
+
+# aarch64 headers
+set(pcsx2aarch64Headers
+	aarch64/BaseblockEx.h
+	aarch64/iCOP0.h
+	aarch64/iFPU.h
+	aarch64/iMMI.h
+	aarch64/iR3000A.h
+	aarch64/iR5900Arit.h
+	aarch64/iR5900AritImm.h
+	aarch64/iR5900Branch.h
+	aarch64/iR5900Jump.h
+	aarch64/iR5900LoadStore.h
+	aarch64/iR5900Move.h
+	aarch64/iR5900MultDiv.h
+	aarch64/iR5900Shift.h
+	aarch64/newVif.h
+	aarch64/newVif_HashBucket.h
+	aarch64/Arm64Emitter.h
+	)
 
 # common Sources
 set(Common
@@ -590,8 +631,8 @@ set(Common
 	${pcsx2SystemHeaders}
 	${pcsx2UtilitiesSources}
 	${pcsx2UtilitiesHeaders}
-	${pcsx2x86Sources}
-	${pcsx2x86Headers}
+	${pcsx2aarch64Sources}
+	${pcsx2aarch64Headers}
 	${pcsx2ZipToolsSources}
 	${pcsx2ZipToolsHeaders}
 	${pcsx2SSources})
@@ -664,7 +705,7 @@ endif()
 # additonal include directories
 include_directories(
     gui
-    x86
+    aarch64
     ${CMAKE_BINARY_DIR}/pcsx2/gui
 )
 
