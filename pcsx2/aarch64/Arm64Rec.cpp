@@ -133,6 +133,7 @@ void aarch64_unmap_reg(ARM64Reg arm_reg, mips_reg_e mips_reg)
     aarch64_current_reg_status[arm_reg] = reg_status_e::USED;
     
     //TODO: dynarec cpu_regs[mips_reg] = arm_reg
+    //aka flush register
 }
 
 ARM64Reg aarch64_get_mapped_reg(mips_reg_e mips_reg)
