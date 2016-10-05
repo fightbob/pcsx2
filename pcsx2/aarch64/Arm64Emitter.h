@@ -259,6 +259,10 @@ constexpr ARM64Reg DecodeReg(ARM64Reg reg)
 {
   return static_cast<ARM64Reg>(reg & 0x1F);
 }
+constexpr ARM64Reg EncodeRegTo32(ARM64Reg reg)
+{
+  return DecodeReg(reg);
+}
 constexpr ARM64Reg EncodeRegTo64(ARM64Reg reg)
 {
   return static_cast<ARM64Reg>(reg | 0x20);
@@ -279,7 +283,7 @@ constexpr ARM64Reg EncodeRegToQuad(ARM64Reg reg)
 // For AND/TST/ORR/EOR etc
 bool IsImmLogical(uint64_t value, unsigned int width, unsigned int* n, unsigned int* imm_s,
                   unsigned int* imm_r);
-// For ADD/SUB
+// For /SUB
 bool IsImmArithmetic(uint64_t input, u32* val, bool* shift);
 
 float FPImm8ToFloat(uint8_t bits);

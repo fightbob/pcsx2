@@ -27,18 +27,28 @@ namespace OpcodeImpl
 {
 
 
-void recADD()
+void recADD(opcode_t op)
 {
-
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
+    
+    ADD(EncodeRegTo32(rd), EncodeRegTo32(rn), EncodeRegTo32(rm));
+    SXTW(EncodeRegTo64(rd), EncodeRegTo32(rd));
 }
 
-void recADDU(void)
+void recADDU(opcode_t op)
 {
-
+    recADD(op);
 }
 
 void recDADD()
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
+    
+    ADD(EncodeRegTo64(rd), EncodeRegTo64(rn), EncodeRegTo64(rm));
 }
 
 void recSUB()

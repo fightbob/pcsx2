@@ -17,6 +17,23 @@
 #include "PrecompiledHeader.h"
 #include "Arm64Emitter.h"
 
+//TODO: move this somewhere better
+struct opcode_t
+{
+	u32 opcode;
+	u32 op() { return (opcode >> 26) & 0x3f; }
+	u32 rd() { return (opcode >> 11) & 0x1f; }
+	u32 rs() { return (opcode >> 21) & 0x1f; }
+	u32 rt() { return (opcode >> 16) & 0x1f; }
+	u32 func() { return opcode & 0x3f; }
+	s16 simm16() { return (s16)opcode; }
+	u16 uimm16() { return (u16)opcode; }
+	s32 offset() { return ((s32)((s16)opcode)) << 2; }
+	u32 sa() { return (opcode >> 6) & 0x1f; }
+	u32 jmp(u32 pc) { return (pc & 0xf0000000) | ((opcode & 0x03ffffff) << 2); }
+	u32 base() { return rs(); }
+};
+
 enum class mips_reg_e
 {
 R0,

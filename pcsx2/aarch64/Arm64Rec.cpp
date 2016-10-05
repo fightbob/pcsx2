@@ -119,6 +119,8 @@ void aarch64_map_reg(ARM64Reg arm_reg, mips_reg_e mips_reg)
     //TODO: handle both 32 bit and 64 bit arm regs?
     aarch64_current_reg_mapping[arm_reg] = mips_reg;
     aarch64_current_reg_status[arm_reg] = reg_status_e::MAPPED;
+    
+    //TODO: dynarec arm_reg = cpu_regs[mips_reg] 
 }
 
 //TODO: we only need to know arm_reg. drop the mips_reg?
@@ -129,6 +131,8 @@ void aarch64_unmap_reg(ARM64Reg arm_reg, mips_reg_e mips_reg)
     
     aarch64_current_reg_map[arm_reg] = mips_reg_E::INVALID;
     aarch64_current_reg_status[arm_reg] = reg_status_e::USED;
+    
+    //TODO: dynarec cpu_regs[mips_reg] = arm_reg
 }
 
 ARM64Reg aarch64_get_mapped_reg(mips_reg_e mips_reg)
@@ -142,20 +146,10 @@ ARM64Reg aarch64_get_mapped_reg(mips_reg_e mips_reg)
 		    return aarch64_reg;
 		}
 	}
-	
-	return ARM64Reg::REG_INVALID;
-}
-
-ARM64Reg aarch64_get_and_map_reg(mips_reg_e mips_reg)
-{
-    ARM64Reg arm_reg = aarch64_get_mapped_reg(mips_reg);
-    if (arm_reg == ARM64Reg::REG_INVALID)
-    {
-        // mips_reg isn't mapped to an arm reg
-        arm_reg = aarch64_get_free_reg();
-        aarch64_map_reg(arm_reg, mips_reg);
-    }   
-    return arm_reg;
-}
+	//mips_reg isn't mapped, so map it here
+	arm_reg = aarch64_get_free_reg();
+    aarch64_map_reg(arm_reg, mips_reg);
     
+	return arm_reg;
+}
 
