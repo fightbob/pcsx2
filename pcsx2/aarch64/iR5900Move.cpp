@@ -16,11 +16,12 @@
 
 #include "PrecompiledHeader.h"
 
-#include "Common.h"
-#include "R5900OpcodeTables.h"
-#include "iR5900.h"
 
-using namespace x86Emitter;
+#include "Common.h"
+#include "Arm64Rec.h"
+#include "Arm64Emitter.h"
+
+using namespace Arm64Gen
 
 namespace R5900 {
 namespace Dynarec {
@@ -28,50 +29,67 @@ namespace OpcodeImpl
 {
 
 
-void recLUI()
+void recLUI(opcode_t op)
+{
+    u32 imm = op.uimm16();
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+
+    MOVZ(rt, imm, SHIFT_16);
+    SXTW(rt, rt);
+}
+
+void recMFHI(opcode_t op)
 {
 }
 
-void recMFHI()
+void recMFLO(opcode_t op)
 {
 }
 
-void recMFLO()
+void recMTHI(opcode_t op)
 {
 }
 
-void recMTHI()
-{
-}
-
-void recMTLO()
-{
-}
-
-
-void recMFHI1()
-{
-}
-
-void recMFLO1()
-{
-
-void recMTHI1()
-{
-}
-
-void recMTLO1()
+void recMTLO(opcode_t op)
 {
 }
 
 
-void recMOVZ()
+void recMFHI1(opcode_t op)
+{
+}
+
+void recMFLO1(opcode_t op)
+{
+
+void recMTHI1(opcode_t op)
+{
+}
+
+void recMTLO1(opcode_t op)
 {
 }
 
 
-void recMOVN()
+void recMOVZ(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+
+    CMP(rs,0);
+    CSEL(rd,rt,rd,CC_EQ);
+}
+
+
+void recMOVN(opcode_t op)
+{
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+
+    CMP(rs,0);
+    CSEL(rd,rt,rd,CC_NEQ);
 }
 
 

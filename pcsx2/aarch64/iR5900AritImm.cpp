@@ -109,15 +109,60 @@ void recSLTI(opcode_t op)
 
 void recANDI(opcode_t op)
 {
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    u32 imm = op.uimm16();
+
+    if (imm <= IMM12_MAX)
+    {
+        AND(EncodeRegTo64(rt),EncodeRegTo64(rs),imm);
+    }
+    else
+    {
+        ARM64Reg temp_reg = aarch64_get_free_reg();
+        MOVZ(temp_reg,imm);
+        AND(EncodeRegTo64(rt),EncodeRegTo64(rs),temp_reg);
+        aarch64_free_reg(temp_reg);
+    }
 }
 
 void recORI(opcode_t op)
 {
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    u32 imm = op.uimm16();
+
+    if (imm <= IMM12_MAX)
+    {
+        ORR(EncodeRegTo64(rt),EncodeRegTo64(rs),imm);
+    }
+    else
+    {
+        ARM64Reg temp_reg = aarch64_get_free_reg();
+        MOVZ(temp_reg,imm);
+        ORR(EncodeRegTo64(rt),EncodeRegTo64(rs),temp_reg);
+        aarch64_free_reg(temp_reg);
+    }
 }
 
 
 void recXORI(opcode_t op)
 {
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    u32 imm = op.uimm16();
+
+    if (imm <= IMM12_MAX)
+    {
+        EOR(EncodeRegTo64(rt),EncodeRegTo64(rs),imm);
+    }
+    else
+    {
+        ARM64Reg temp_reg = aarch64_get_free_reg();
+        MOVZ(temp_reg,imm);
+        EOR(EncodeRegTo64(rt),EncodeRegTo64(rs),temp_reg);
+        aarch64_free_reg(temp_reg);
+    }
 }
 
 

@@ -30,59 +30,71 @@ namespace OpcodeImpl
 {
 
 
-void recBEQ_(int info) { recBEQ_process(info, 0); }
+void recBEQ(opcode_t op)
+{
 
-void recBNE_(int info) { recBNE_process(info, 0); }
+}
 
-void recBEQL_(int info) { recBEQL_process(info, 0); }
+void recBNE(opcode_t op)
+{
 
-void recBNEL_(int info) { recBNEL_process(info, 0); }
+}
 
-void recBLTZAL()
+void recBEQL(opcode_t op)
+{
+
+}
+
+void recBNEL(opcode_t op)
+{
+
+}
+
+void recBLTZAL(opcode_t op)
 {
 }
 
-void recBGEZAL()
+void recBGEZAL(opcode_t op)
 {
 }
 
-void recBLTZALL()
+void recBLTZALL(opcode_t op)
 {
 }
 
-void recBGEZALL()
+void recBGEZALL(opcode_t op)
 {
 }
 
-void recBLEZ()
+void recBLEZ(opcode_t op)
 {
 }
 
-void recBGTZ()
+void recBGTZ(opcode_t op)
 {
 }
 
-void recBLTZ()
+void recBLTZ(opcode_t op)
 {
 }
 
-void recBGEZ()
+void recBGEZ(opcode_t op)
 {
 }
 
-void recBLTZL()
+void recBLTZL(opcode_t op)
 {
 }
 
-void recBGEZL()
+void recBGEZL(opcode_t op)
 {
 }
 
-void recBLEZL()
+void recBLEZL(opcode_t op)
 {
 }
 
-void recBGTZL()
+void recBGTZL(opcode_t op)
 {
 }
 

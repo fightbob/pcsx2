@@ -17,10 +17,10 @@
 #include "PrecompiledHeader.h"
 
 #include "Common.h"
-#include "R5900OpcodeTables.h"
-#include "iR5900.h"
+#include "Arm64Rec.h"
+#include "Arm64Emitter.h"
 
-using namespace x86Emitter;
+using namespace Arm64Gen;
 
 namespace R5900 {
 namespace Dynarec {
@@ -28,76 +28,156 @@ namespace OpcodeImpl
 {
 
 
-void recSLL_(int info)
+void recSLL(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    int sa = op.sa();
+
+    LSL(EncodeRegTo32(rd),rt,sa);
+    SXTW(rd,rd);
 }
 
-void recSRL_(int info)
+void recSRL(opcode_t op)
 {
-}
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    int sa = op.sa();
 
-
-void recSRA_(int info)
-{
-}
-
-
-void recDSLL_(int info)
-{
-}
-
-void recDSRL_(int info)
-{
-}
-
-
-void recDSRA_(int info)
-{
+    LSR(EncodeRegTo32(rd),rt,sa);
+    SXTW(rd,rd);
 }
 
 
-void recDSLL32_(int info)
+void recSRA(opcode_t op)
 {
-}
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    int sa = op.sa();
 
-void recDSRL32_(int info)
-{
-}
-
-
-void recDSRA32_(int info)
-{
+    ASR(EncodeRegTo32(rd),rt,sa);
+    SXTW(rd,rd);
 }
 
 
-void recSLLV_(int info)
+void recDSLL(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    int sa = op.sa();
 
+    LSL(EncodeRegTo64(rd),rt,sa);
+}
+
+void recDSRL(opcode_t op)
+{
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    int sa = op.sa();
+
+    LSR(EncodeRegTo64(rd),rt,sa);
 }
 
 
-void recSRLV_(int info)
+void recDSRA(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    int sa = op.sa();
+
+    ASR(EncodeRegTo64(rd),rt,sa);
 }
 
 
-void recSRAV_(int info)
+void recDSLL32(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    int sa = op.sa();
+
+    LSL(EncodeRegTo64(rd),rt,sa+32);
+}
+
+void recDSRL32(opcode_t op)
+{
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    int sa = op.sa();
+
+    LSR(EncodeRegTo64(rd),rt,sa+32);
 }
 
 
-void recDSLLV_(int info)
+void recDSRA32(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    int sa = op.sa();
+
+    ASR(EncodeRegTo64(rd),rt,sa+32);
 }
 
 
-void recDSRLV_(int info)
+void recSLLV(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+
+    LSLV(EncodeRegTo32(rd),rs,rt);
+    SXTW(rd,rd);
 }
 
 
-void recDSRAV_(int info)
+void recSRLV(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+
+    LSRV(EncodeRegTo32(rd),rs,rt);
+    SXTW(rd,rd);
+}
+
+
+void recSRAV(opcode_t op)
+{
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+
+    ASRV(EncodeRegTo32(rd),rs,rt);
+    SXTW(rd,rd);
+}
+
+
+void recDSLLV(opcode_t op)
+{
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+
+    LSLV(EncodeRegTo64(rd),rs,rt);
+}
+
+
+void recDSRLV(opcode_t op)
+{
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+
+    LSRV(EncodeRegTo64(rd),rs,rt);
+}
+
+
+void recDSRAV(opcode_t op)
+{
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+
+    ASRV(EncodeRegTo64(rd),rs,rt);
 }
 
 } } }
