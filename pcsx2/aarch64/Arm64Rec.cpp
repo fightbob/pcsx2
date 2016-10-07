@@ -17,9 +17,25 @@
 #include "PrecompiledHeader.h"
 #include "Arm64Emitter.h"
 #include "Arm64Reg.h"
+#include "R5900.h"
 
+using namespace Arm64Gen;
 
-constexpr std::array<ARM64Reg,29> aarch64_reg_alloc_order = 
+// aarch64 has a lot of registers, but no good way to load from some arbitrary address
+// for flushing and loading registers, we need to work with the mips cpu context
+// so just store a pointer to it in some given register, then LDR/STR to/from it whenever
+// we need something. We have 29 registers to allocate... I think we can give one or two up
+// for such usage
+#define MIPS_CPU_CTX_REG W28
+#define MIPS_FPU_CTX_REG W27
+#define MEMORY_BASE_REG W26
+
+//we need everything in cpu and fpu regs to be within a offset of the beginning so that
+// aarch64 instructions can reach them. That shouldn't be an issue
+static_assert(sizeof(cpuRegs) < 16380, "cpuRegs is too big!");
+static_assert(sizeof(fpuRegs) < 16380, "fpuRegs is too big!");
+
+const std::array<ARM64Reg,26> aarch64_reg_alloc_order =
 {
   W0,
   W1,
@@ -46,13 +62,10 @@ constexpr std::array<ARM64Reg,29> aarch64_reg_alloc_order =
   W22,
   W23,
   W24,
-  W25,
-  W26,
-  W27,
-  W28
+  W25
 };
 
-constexpr std::array<ARM64Reg,10> aarch64_callee_saved_regs = 
+const std::array<ARM64Reg,10> aarch64_callee_saved_regs =
 {
   W19,
   W20,
@@ -107,7 +120,7 @@ ARM64Reg aarch64_get_free_reg()
 void aarch64_free_reg(ARM64Reg reg)
 {
     assert(aarch64_current_reg_status[arm_reg] == reg_status_e::USED);
-    
+
     aarch64_current_reg_status[arm_reg] = reg_status_e::UNUSED;
 }
 
@@ -115,12 +128,12 @@ void aarch64_map_reg(ARM64Reg arm_reg, mips_reg_e mips_reg)
 {
     assert(aarch64_current_reg_mapping[arm_reg] == mips_reg_e::INVALID);
     assert(aarch64_current_reg_status[arm_reg] == reg_status_e::USED);
-    
+
     //TODO: handle both 32 bit and 64 bit arm regs?
     aarch64_current_reg_mapping[arm_reg] = mips_reg;
     aarch64_current_reg_status[arm_reg] = reg_status_e::MAPPED;
-    
-    //TODO: dynarec arm_reg = cpu_regs[mips_reg] 
+
+    //TODO: dynarec arm_reg = cpu_regs[mips_reg]
 }
 
 //TODO: we only need to know arm_reg. drop the mips_reg?
@@ -128,10 +141,10 @@ void aarch64_unmap_reg(ARM64Reg arm_reg, mips_reg_e mips_reg)
 {
     assert(aarch64_current_reg_mapping[arm_reg] == mips_reg);
     assert(aarch64_current_reg_status[arm_reg] == reg_status_e::MAPPED);
-    
+
     aarch64_current_reg_map[arm_reg] = mips_reg_E::INVALID;
     aarch64_current_reg_status[arm_reg] = reg_status_e::USED;
-    
+
     //TODO: dynarec cpu_regs[mips_reg] = arm_reg
     //aka flush register
 }
@@ -139,7 +152,7 @@ void aarch64_unmap_reg(ARM64Reg arm_reg, mips_reg_e mips_reg)
 ARM64Reg aarch64_get_mapped_reg(mips_reg_e mips_reg)
 {
     assert(mips_reg != mips_reg_e::INVALID);
-    
+
     for (ARM64Reg aarch64_reg : aarch64_reg_alloc_order)
 	{
 		if (aarch64_current_reg_mapping[aarch64_reg] == mips_reg)
@@ -150,7 +163,16 @@ ARM64Reg aarch64_get_mapped_reg(mips_reg_e mips_reg)
 	//mips_reg isn't mapped, so map it here
 	arm_reg = aarch64_get_free_reg();
     aarch64_map_reg(arm_reg, mips_reg);
-    
+
 	return arm_reg;
 }
 
+void aarch64_load_from_mips_ctx(mips_reg_e mips_reg, ARM64Reg arm_reg)
+{
+    STR(INDEX_UNSIGNED, arm_reg, MIPS_CPU_CTX_REG, )
+}
+
+void aarch64_flush_to_mips_ctx(mips_reg_e mips_reg, ARM64Reg arm_reg)
+{
+
+}

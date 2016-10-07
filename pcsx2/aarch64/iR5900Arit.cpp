@@ -19,7 +19,7 @@
 #include "Common.h"
 #include "Arm64Rec.h"
 
-using namespace x86Emitter;
+using namespace Arm64Gen;
 
 namespace R5900 {
 namespace Dynarec {
@@ -32,7 +32,7 @@ void recADD(opcode_t op)
     ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
     ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
     ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
-    
+
     ADD(EncodeRegTo32(rd), EncodeRegTo32(rn), EncodeRegTo32(rm));
     SXTW(EncodeRegTo64(rd), EncodeRegTo32(rd));
 }
@@ -47,7 +47,7 @@ void recDADD()
     ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
     ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
     ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
-    
+
     ADD(EncodeRegTo64(rd), EncodeRegTo64(rn), EncodeRegTo64(rm));
 }
 
@@ -70,6 +70,11 @@ void recDSUBU(void)
 
 void recAND()
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
+
+    AND
 }
 
 void recOR()

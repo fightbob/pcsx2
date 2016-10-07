@@ -16,6 +16,9 @@
 
 #include "PrecompiledHeader.h"
 #include "Arm64Emitter.h"
+#include "R5900.h"
+
+#define MIPS_CPU_CTX_OFFSET(elem) (offsetof(cpuRegs,elem))
 
 //TODO: move this somewhere better
 struct opcode_t
