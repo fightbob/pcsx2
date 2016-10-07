@@ -14,6 +14,36 @@
 
 namespace Arm64Gen
 {
+
+static void EncodeCompareBranchInst(u32 op, ARM64Reg Rt, const void* ptr);
+static void EncodeTestBranchInst(u32 op, ARM64Reg Rt, u8 bits, const void* ptr);
+static void EncodeUnconditionalBranchInst(u32 op, const void* ptr);
+static void EncodeUnconditionalBranchInst(u32 opc, u32 op2, u32 op3, u32 op4, ARM64Reg Rn);
+static void EncodeExceptionInst(u32 instenc, u32 imm);
+static void EncodeSystemInst(u32 op0, u32 op1, u32 CRn, u32 CRm, u32 op2, ARM64Reg Rt);
+static void EncodeArithmeticInst(u32 instenc, bool flags, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm, ArithOption Option);
+static void EncodeArithmeticCarryInst(u32 op, bool flags, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm);
+static void EncodeCondCompareImmInst(u32 op, ARM64Reg Rn, u32 imm, u32 nzcv, CCFlags cond);
+static void EncodeCondCompareRegInst(u32 op, ARM64Reg Rn, ARM64Reg Rm, u32 nzcv, CCFlags cond);
+static void EncodeCondSelectInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm, CCFlags cond);
+static void EncodeData1SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn);
+static void EncodeData2SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm);
+static void EncodeData3SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm, ARM64Reg Ra);
+static void EncodeLogicalInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm, ArithOption Shift);
+static void EncodeLoadRegisterInst(u32 bitop, ARM64Reg Rt, u32 imm);
+static void EncodeLoadStoreExcInst(u32 instenc, ARM64Reg Rs, ARM64Reg Rt2, ARM64Reg Rn, ARM64Reg Rt);
+static void EncodeLoadStorePairedInst(u32 op, ARM64Reg Rt, ARM64Reg Rt2, ARM64Reg Rn, u32 imm);
+static void EncodeLoadStoreIndexedInst(u32 op, u32 op2, ARM64Reg Rt, ARM64Reg Rn, s32 imm);
+static void EncodeLoadStoreIndexedInst(u32 op, ARM64Reg Rt, ARM64Reg Rn, s32 imm, u8 size);
+static void EncodeMOVWideInst(u32 op, ARM64Reg Rd, u32 imm, ShiftAmount pos);
+static void EncodeBitfieldMOVInst(u32 op, ARM64Reg Rd, ARM64Reg Rn, u32 immr, u32 imms);
+static void EncodeLoadStoreRegisterOffset(u32 size, u32 opc, ARM64Reg Rt, ARM64Reg Rn, ArithOption Rm);
+static void EncodeAddSubImmInst(u32 op, bool flags, u32 shift, u32 imm, ARM64Reg Rn, ARM64Reg Rd);
+static void EncodeLogicalImmInst(u32 op, ARM64Reg Rd, ARM64Reg Rn, u32 immr, u32 imms, int n);
+static void EncodeLoadStorePair(u32 op, u32 load, IndexType type, ARM64Reg Rt, ARM64Reg Rt2, ARM64Reg Rn, s32 imm);
+static void EncodeAddressInst(u32 op, ARM64Reg Rd, s32 imm);
+static void EncodeLoadStoreUnscaled(u32 size, u32 op, ARM64Reg Rt, ARM64Reg Rn, s32 imm);
+
 const int kWRegSizeInBits = 32;
 const int kXRegSizeInBits = 64;
 
@@ -475,7 +505,7 @@ static const u32 LoadStoreExcEnc[][5] = {
     {3, 1, 1, 0, 1},  // (64bit) LDAR
 };
 
-void EncodeCompareBranchInst(u32 op, ARM64Reg Rt, const void* ptr)
+static void EncodeCompareBranchInst(u32 op, ARM64Reg Rt, const void* ptr)
 {
   bool b64Bit = Is64Bit(Rt);
   s64 distance = (s64)ptr - (s64)m_code;
@@ -492,7 +522,7 @@ void EncodeCompareBranchInst(u32 op, ARM64Reg Rt, const void* ptr)
   Write32((b64Bit << 31) | (0x34 << 24) | (op << 24) | (((u32)distance << 5) & 0xFFFFE0) | Rt);
 }
 
-void EncodeTestBranchInst(u32 op, ARM64Reg Rt, u8 bits, const void* ptr)
+static void EncodeTestBranchInst(u32 op, ARM64Reg Rt, u8 bits, const void* ptr)
 {
   bool b64Bit = Is64Bit(Rt);
   s64 distance = (s64)ptr - (s64)m_code;
@@ -510,7 +540,7 @@ void EncodeTestBranchInst(u32 op, ARM64Reg Rt, u8 bits, const void* ptr)
           (((u32)distance << 5) & 0x7FFE0) | Rt);
 }
 
-void EncodeUnconditionalBranchInst(u32 op, const void* ptr)
+static void EncodeUnconditionalBranchInst(u32 op, const void* ptr)
 {
   s64 distance = (s64)ptr - s64(m_code);
 
@@ -525,13 +555,13 @@ void EncodeUnconditionalBranchInst(u32 op, const void* ptr)
   Write32((op << 31) | (0x5 << 26) | (distance & 0x3FFFFFF));
 }
 
-void EncodeUnconditionalBranchInst(u32 opc, u32 op2, u32 op3, u32 op4, ARM64Reg Rn)
+static void EncodeUnconditionalBranchInst(u32 opc, u32 op2, u32 op3, u32 op4, ARM64Reg Rn)
 {
   Rn = DecodeReg(Rn);
   Write32((0x6B << 25) | (opc << 21) | (op2 << 16) | (op3 << 10) | (Rn << 5) | op4);
 }
 
-void EncodeExceptionInst(u32 instenc, u32 imm)
+static void EncodeExceptionInst(u32 instenc, u32 imm)
 {
   _assert_msg_(DYNA_REC, !(imm & ~0xFFFF), "%s: Exception instruction too large immediate: %d",
                __FUNCTION__, imm);
@@ -540,12 +570,12 @@ void EncodeExceptionInst(u32 instenc, u32 imm)
           ExcEnc[instenc][2]);
 }
 
-void EncodeSystemInst(u32 op0, u32 op1, u32 CRn, u32 CRm, u32 op2, ARM64Reg Rt)
+static void EncodeSystemInst(u32 op0, u32 op1, u32 CRn, u32 CRm, u32 op2, ARM64Reg Rt)
 {
   Write32((0x354 << 22) | (op0 << 19) | (op1 << 16) | (CRn << 12) | (CRm << 8) | (op2 << 5) | Rt);
 }
 
-void EncodeArithmeticInst(u32 instenc, bool flags, ARM64Reg Rd, ARM64Reg Rn,
+static void EncodeArithmeticInst(u32 instenc, bool flags, ARM64Reg Rd, ARM64Reg Rn,
                                          ARM64Reg Rm, ArithOption Option)
 {
   bool b64Bit = Is64Bit(Rd);
@@ -558,7 +588,7 @@ void EncodeArithmeticInst(u32 instenc, bool flags, ARM64Reg Rd, ARM64Reg Rn,
           Option.GetData() | (Rn << 5) | Rd);
 }
 
-void EncodeArithmeticCarryInst(u32 op, bool flags, ARM64Reg Rd, ARM64Reg Rn,
+static void EncodeArithmeticCarryInst(u32 op, bool flags, ARM64Reg Rd, ARM64Reg Rn,
                                               ARM64Reg Rm)
 {
   bool b64Bit = Is64Bit(Rd);
@@ -569,7 +599,7 @@ void EncodeArithmeticCarryInst(u32 op, bool flags, ARM64Reg Rd, ARM64Reg Rn,
   Write32((b64Bit << 31) | (op << 30) | (flags << 29) | (0xD0 << 21) | (Rm << 16) | (Rn << 5) | Rd);
 }
 
-void EncodeCondCompareImmInst(u32 op, ARM64Reg Rn, u32 imm, u32 nzcv, CCFlags cond)
+static void EncodeCondCompareImmInst(u32 op, ARM64Reg Rn, u32 imm, u32 nzcv, CCFlags cond)
 {
   bool b64Bit = Is64Bit(Rn);
 
@@ -581,7 +611,7 @@ void EncodeCondCompareImmInst(u32 op, ARM64Reg Rn, u32 imm, u32 nzcv, CCFlags co
           (1 << 11) | (Rn << 5) | nzcv);
 }
 
-void EncodeCondCompareRegInst(u32 op, ARM64Reg Rn, ARM64Reg Rm, u32 nzcv,
+static void EncodeCondCompareRegInst(u32 op, ARM64Reg Rn, ARM64Reg Rm, u32 nzcv,
                                              CCFlags cond)
 {
   bool b64Bit = Is64Bit(Rm);
@@ -594,7 +624,7 @@ void EncodeCondCompareRegInst(u32 op, ARM64Reg Rn, ARM64Reg Rm, u32 nzcv,
           (Rn << 5) | nzcv);
 }
 
-void EncodeCondSelectInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm,
+static void EncodeCondSelectInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm,
                                          CCFlags cond)
 {
   bool b64Bit = Is64Bit(Rd);
@@ -606,7 +636,7 @@ void EncodeCondSelectInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm,
           (cond << 12) | (CondSelectEnc[instenc][1] << 10) | (Rn << 5) | Rd);
 }
 
-void EncodeData1SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn)
+static void EncodeData1SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn)
 {
   bool b64Bit = Is64Bit(Rd);
 
@@ -616,7 +646,7 @@ void EncodeData1SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn)
           (Data1SrcEnc[instenc][1] << 10) | (Rn << 5) | Rd);
 }
 
-void EncodeData2SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm)
+static void EncodeData2SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm)
 {
   bool b64Bit = Is64Bit(Rd);
 
@@ -627,7 +657,7 @@ void EncodeData2SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm)
           Rd);
 }
 
-void EncodeData3SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm,
+static void EncodeData3SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm,
                                        ARM64Reg Ra)
 {
   bool b64Bit = Is64Bit(Rd);
@@ -640,7 +670,7 @@ void EncodeData3SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm,
           (Data3SrcEnc[instenc][1] << 15) | (Ra << 10) | (Rn << 5) | Rd);
 }
 
-void EncodeLogicalInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm,
+static void EncodeLogicalInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm,
                                       ArithOption Shift)
 {
   bool b64Bit = Is64Bit(Rd);
@@ -652,7 +682,7 @@ void EncodeLogicalInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm,
           (LogicalEnc[instenc][1] << 21) | Shift.GetData() | (Rm << 16) | (Rn << 5) | Rd);
 }
 
-void EncodeLoadRegisterInst(u32 bitop, ARM64Reg Rt, u32 imm)
+static void EncodeLoadRegisterInst(u32 bitop, ARM64Reg Rt, u32 imm)
 {
   bool b64Bit = Is64Bit(Rt);
   bool bVec = IsVector(Rt);
@@ -665,7 +695,7 @@ void EncodeLoadRegisterInst(u32 bitop, ARM64Reg Rt, u32 imm)
   Write32((bitop << 30) | (bVec << 26) | (0x18 << 24) | (imm << 5) | Rt);
 }
 
-void EncodeLoadStoreExcInst(u32 instenc, ARM64Reg Rs, ARM64Reg Rt2, ARM64Reg Rn,
+static void EncodeLoadStoreExcInst(u32 instenc, ARM64Reg Rs, ARM64Reg Rt2, ARM64Reg Rn,
                                            ARM64Reg Rt)
 {
   Rs = DecodeReg(Rs);
@@ -677,7 +707,7 @@ void EncodeLoadStoreExcInst(u32 instenc, ARM64Reg Rs, ARM64Reg Rt2, ARM64Reg Rn,
           (LoadStoreExcEnc[instenc][4] << 15) | (Rt2 << 10) | (Rn << 5) | Rt);
 }
 
-void EncodeLoadStorePairedInst(u32 op, ARM64Reg Rt, ARM64Reg Rt2, ARM64Reg Rn,
+static void EncodeLoadStorePairedInst(u32 op, ARM64Reg Rt, ARM64Reg Rt2, ARM64Reg Rn,
                                               u32 imm)
 {
   bool b64Bit = Is64Bit(Rt);
@@ -707,7 +737,7 @@ void EncodeLoadStorePairedInst(u32 op, ARM64Reg Rt, ARM64Reg Rt2, ARM64Reg Rn,
   Write32((opc << 30) | (bVec << 26) | (op << 22) | (imm << 15) | (Rt2 << 10) | (Rn << 5) | Rt);
 }
 
-void EncodeLoadStoreIndexedInst(u32 op, u32 op2, ARM64Reg Rt, ARM64Reg Rn, s32 imm)
+static void EncodeLoadStoreIndexedInst(u32 op, u32 op2, ARM64Reg Rt, ARM64Reg Rn, s32 imm)
 {
   bool b64Bit = Is64Bit(Rt);
   bool bVec = IsVector(Rt);
@@ -722,7 +752,7 @@ void EncodeLoadStoreIndexedInst(u32 op, u32 op2, ARM64Reg Rt, ARM64Reg Rn, s32 i
           Rt);
 }
 
-void EncodeLoadStoreIndexedInst(u32 op, ARM64Reg Rt, ARM64Reg Rn, s32 imm, u8 size)
+static void EncodeLoadStoreIndexedInst(u32 op, ARM64Reg Rt, ARM64Reg Rn, s32 imm, u8 size)
 {
   bool b64Bit = Is64Bit(Rt);
   bool bVec = IsVector(Rt);
@@ -744,7 +774,7 @@ void EncodeLoadStoreIndexedInst(u32 op, ARM64Reg Rt, ARM64Reg Rn, s32 imm, u8 si
   Write32((b64Bit << 30) | (op << 22) | (bVec << 26) | (imm << 10) | (Rn << 5) | Rt);
 }
 
-void EncodeMOVWideInst(u32 op, ARM64Reg Rd, u32 imm, ShiftAmount pos)
+static void EncodeMOVWideInst(u32 op, ARM64Reg Rd, u32 imm, ShiftAmount pos)
 {
   bool b64Bit = Is64Bit(Rd);
 
@@ -754,7 +784,7 @@ void EncodeMOVWideInst(u32 op, ARM64Reg Rd, u32 imm, ShiftAmount pos)
   Write32((b64Bit << 31) | (op << 29) | (0x25 << 23) | (pos << 21) | (imm << 5) | Rd);
 }
 
-void EncodeBitfieldMOVInst(u32 op, ARM64Reg Rd, ARM64Reg Rn, u32 immr, u32 imms)
+static void EncodeBitfieldMOVInst(u32 op, ARM64Reg Rd, ARM64Reg Rn, u32 immr, u32 imms)
 {
   bool b64Bit = Is64Bit(Rd);
 
@@ -764,7 +794,7 @@ void EncodeBitfieldMOVInst(u32 op, ARM64Reg Rd, ARM64Reg Rn, u32 immr, u32 imms)
           (imms << 10) | (Rn << 5) | Rd);
 }
 
-void EncodeLoadStoreRegisterOffset(u32 size, u32 opc, ARM64Reg Rt, ARM64Reg Rn,
+static void EncodeLoadStoreRegisterOffset(u32 size, u32 opc, ARM64Reg Rt, ARM64Reg Rn,
                                                   ArithOption Rm)
 {
   Rt = DecodeReg(Rt);
@@ -775,7 +805,7 @@ void EncodeLoadStoreRegisterOffset(u32 size, u32 opc, ARM64Reg Rt, ARM64Reg Rn,
           (1 << 11) | (Rn << 5) | Rt);
 }
 
-void EncodeAddSubImmInst(u32 op, bool flags, u32 shift, u32 imm, ARM64Reg Rn,
+static void EncodeAddSubImmInst(u32 op, bool flags, u32 shift, u32 imm, ARM64Reg Rn,
                                         ARM64Reg Rd)
 {
   bool b64Bit = Is64Bit(Rd);
@@ -788,7 +818,7 @@ void EncodeAddSubImmInst(u32 op, bool flags, u32 shift, u32 imm, ARM64Reg Rn,
           (Rn << 5) | Rd);
 }
 
-void EncodeLogicalImmInst(u32 op, ARM64Reg Rd, ARM64Reg Rn, u32 immr, u32 imms,
+static void EncodeLogicalImmInst(u32 op, ARM64Reg Rd, ARM64Reg Rn, u32 immr, u32 imms,
                                          int n)
 {
   // Sometimes Rd is fixed to SP, but can still be 32bit or 64bit.
@@ -802,7 +832,7 @@ void EncodeLogicalImmInst(u32 op, ARM64Reg Rd, ARM64Reg Rn, u32 immr, u32 imms,
           (Rn << 5) | Rd);
 }
 
-void EncodeLoadStorePair(u32 op, u32 load, IndexType type, ARM64Reg Rt, ARM64Reg Rt2,
+static void EncodeLoadStorePair(u32 op, u32 load, IndexType type, ARM64Reg Rt, ARM64Reg Rt2,
                                         ARM64Reg Rn, s32 imm)
 {
   bool b64Bit = Is64Bit(Rt);
@@ -841,14 +871,14 @@ void EncodeLoadStorePair(u32 op, u32 load, IndexType type, ARM64Reg Rt, ARM64Reg
   Write32((op << 30) | (0b101 << 27) | (type_encode << 23) | (load << 22) | ((imm & 0x7F) << 15) |
           (Rt2 << 10) | (Rn << 5) | Rt);
 }
-void EncodeAddressInst(u32 op, ARM64Reg Rd, s32 imm)
+static void EncodeAddressInst(u32 op, ARM64Reg Rd, s32 imm)
 {
   Rd = DecodeReg(Rd);
 
   Write32((op << 31) | ((imm & 0x3) << 29) | (0x10 << 24) | ((imm & 0x1FFFFC) << 3) | Rd);
 }
 
-void EncodeLoadStoreUnscaled(u32 size, u32 op, ARM64Reg Rt, ARM64Reg Rn, s32 imm)
+static void EncodeLoadStoreUnscaled(u32 size, u32 op, ARM64Reg Rt, ARM64Reg Rn, s32 imm)
 {
   _assert_msg_(DYNA_REC, !(imm < -256 || imm > 255), "%s received too large offset: %d",
                __FUNCTION__, imm);

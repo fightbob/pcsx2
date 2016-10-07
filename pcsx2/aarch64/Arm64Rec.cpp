@@ -133,7 +133,7 @@ void aarch64_map_reg(ARM64Reg arm_reg, mips_reg_e mips_reg)
     aarch64_current_reg_mapping[arm_reg] = mips_reg;
     aarch64_current_reg_status[arm_reg] = reg_status_e::MAPPED;
 
-    //TODO: dynarec arm_reg = cpu_regs[mips_reg]
+    aarch64_load_from_mips_ctx(mips_reg, arm_reg);
 }
 
 //TODO: we only need to know arm_reg. drop the mips_reg?
@@ -145,8 +145,7 @@ void aarch64_unmap_reg(ARM64Reg arm_reg, mips_reg_e mips_reg)
     aarch64_current_reg_map[arm_reg] = mips_reg_E::INVALID;
     aarch64_current_reg_status[arm_reg] = reg_status_e::USED;
 
-    //TODO: dynarec cpu_regs[mips_reg] = arm_reg
-    //aka flush register
+    aarch64_flush_to_mips_ctx(mips_reg, arm_reg);
 }
 
 ARM64Reg aarch64_get_mapped_reg(mips_reg_e mips_reg)
@@ -169,10 +168,21 @@ ARM64Reg aarch64_get_mapped_reg(mips_reg_e mips_reg)
 
 void aarch64_load_from_mips_ctx(mips_reg_e mips_reg, ARM64Reg arm_reg)
 {
-    STR(INDEX_UNSIGNED, arm_reg, MIPS_CPU_CTX_REG, )
+    LDR(INDEX_UNSIGNED, arm_reg, MIPS_CPU_CTX_REG, MIPS_CPU_CTX_REG(GPR.r[mips_reg]));
 }
 
 void aarch64_flush_to_mips_ctx(mips_reg_e mips_reg, ARM64Reg arm_reg)
 {
+    STR(INDEX_UNSIGNED, arm_reg, MIPS_CPU_CTX_REG, MIPS_CPU_CTX_REG(GPR.r[mips_reg]));
+}
 
+void aarch64_flush_all_regs()
+{
+    for (const auto& mapping : aarch64_current_reg_mapping)
+    {
+        if (mapping.second != mips_reg_e::INVALID)
+        {
+            aarch64_flush_to_mips_ctx(mapping.second, mapping.first);
+        }
+    }
 }

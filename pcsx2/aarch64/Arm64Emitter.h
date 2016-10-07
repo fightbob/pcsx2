@@ -14,6 +14,29 @@
 
 namespace Arm64Gen
 {
+
+enum CCFlags
+{
+    CC_EQ = 0,      // Equal
+    CC_NEQ,         // Not equal
+    CC_CS,          // Carry Set
+    CC_CC,          // Carry Clear
+    CC_MI,          // Minus (Negative)
+    CC_PL,          // Plus
+    CC_VS,          // Overflow
+    CC_VC,          // No Overflow
+    CC_HI,          // Unsigned higher
+    CC_LS,          // Unsigned lower or same
+    CC_GE,          // Signed greater than or equal
+    CC_LT,          // Signed less than
+    CC_GT,          // Signed greater than
+    CC_LE,          // Signed less than or equal
+    CC_AL,          // Always (unconditional) 14
+    CC_HS = CC_CS,  // Alias of CC_CS  Unsigned higher or same
+    CC_LO = CC_CC,  // Alias of CC_CC  Unsigned lower
+};
+const u32 NO_COND = 0xE0000000;
+
 // X30 serves a dual purpose as a link register
 // Encoded as <u3:type><u5:reg>
 // Types:
@@ -504,36 +527,6 @@ public:
 //u8* m_code;
 //u8* m_lastCacheFlushEnd;
 
-void EncodeCompareBranchInst(u32 op, ARM64Reg Rt, const void* ptr);
-void EncodeTestBranchInst(u32 op, ARM64Reg Rt, u8 bits, const void* ptr);
-void EncodeUnconditionalBranchInst(u32 op, const void* ptr);
-void EncodeUnconditionalBranchInst(u32 opc, u32 op2, u32 op3, u32 op4, ARM64Reg Rn);
-void EncodeExceptionInst(u32 instenc, u32 imm);
-void EncodeSystemInst(u32 op0, u32 op1, u32 CRn, u32 CRm, u32 op2, ARM64Reg Rt);
-void EncodeArithmeticInst(u32 instenc, bool flags, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm,
-                        ArithOption Option);
-void EncodeArithmeticCarryInst(u32 op, bool flags, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm);
-void EncodeCondCompareImmInst(u32 op, ARM64Reg Rn, u32 imm, u32 nzcv, CCFlags cond);
-void EncodeCondCompareRegInst(u32 op, ARM64Reg Rn, ARM64Reg Rm, u32 nzcv, CCFlags cond);
-void EncodeCondSelectInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm, CCFlags cond);
-void EncodeData1SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn);
-void EncodeData2SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm);
-void EncodeData3SrcInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm, ARM64Reg Ra);
-void EncodeLogicalInst(u32 instenc, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm, ArithOption Shift);
-void EncodeLoadRegisterInst(u32 bitop, ARM64Reg Rt, u32 imm);
-void EncodeLoadStoreExcInst(u32 instenc, ARM64Reg Rs, ARM64Reg Rt2, ARM64Reg Rn, ARM64Reg Rt);
-void EncodeLoadStorePairedInst(u32 op, ARM64Reg Rt, ARM64Reg Rt2, ARM64Reg Rn, u32 imm);
-void EncodeLoadStoreIndexedInst(u32 op, u32 op2, ARM64Reg Rt, ARM64Reg Rn, s32 imm);
-void EncodeLoadStoreIndexedInst(u32 op, ARM64Reg Rt, ARM64Reg Rn, s32 imm, u8 size);
-void EncodeMOVWideInst(u32 op, ARM64Reg Rd, u32 imm, ShiftAmount pos);
-void EncodeBitfieldMOVInst(u32 op, ARM64Reg Rd, ARM64Reg Rn, u32 immr, u32 imms);
-void EncodeLoadStoreRegisterOffset(u32 size, u32 opc, ARM64Reg Rt, ARM64Reg Rn, ArithOption Rm);
-void EncodeAddSubImmInst(u32 op, bool flags, u32 shift, u32 imm, ARM64Reg Rn, ARM64Reg Rd);
-void EncodeLogicalImmInst(u32 op, ARM64Reg Rd, ARM64Reg Rn, u32 immr, u32 imms, int n);
-void EncodeLoadStorePair(u32 op, u32 load, IndexType type, ARM64Reg Rt, ARM64Reg Rt2, ARM64Reg Rn,
-                       s32 imm);
-void EncodeAddressInst(u32 op, ARM64Reg Rd, s32 imm);
-void EncodeLoadStoreUnscaled(u32 size, u32 op, ARM64Reg Rt, ARM64Reg Rn, s32 imm);
 
 void Write32(u32 value);
 
