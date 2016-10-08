@@ -33,6 +33,7 @@ static_assert(sizeof(cpuRegs) < 16380, "cpuRegs is too big!");
 static_assert(sizeof(fpuRegs) < 16380, "fpuRegs is too big!");
 
 #define MIPS_CPU_CTX_OFFSET(elem) (offsetof(cpuRegs,elem))
+#define THUNK_FUNCS_OFFSET(elem)  (offsetof(thunk_funcs_t,elem))
 
 constexpr int IMM12_MAX = ((1 << 12) - 1);
 
@@ -156,9 +157,7 @@ void aarch64_flush_and_unmap_all_regs();
 
 void aarch64_load_all_mapped_regs();
 
-void aarch64_flush_callee_saved_regs();
-
-void aarch64_thunk();
+void aarch64_flush_caller_saved_regs();
 
 u8 thunk_mem_read_8(u32 addr);
 u16 thunk_mem_read_16(u32 addr);

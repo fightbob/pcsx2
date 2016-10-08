@@ -199,11 +199,11 @@ void aarch64_load_all_mapped_regs()
     }
 }
 
-void aarch64_flush_callee_saved_regs()
+void aarch64_flush_caller_saved_regs()
 {
     for (const auto& mapping : aarch64_current_reg_mapping)
     {
-        if (mapping.second != mips_reg_e::INVALID && aarch64_is_callee_saved_register(mapping.first))
+        if (mapping.second != mips_reg_e::INVALID && !aarch64_is_callee_saved_register(mapping.first))
         {
             aarch64_flush_to_mips_ctx(mapping.second, mapping.first);
         }
