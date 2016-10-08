@@ -22,13 +22,9 @@
 #include "PrecompiledHeader.h"
 
 #include "Common.h"
-#include "R5900OpcodeTables.h"
-#include "iR5900.h"
-#include "iMMI.h"
-#include "Utilities/MathUtils.h"
+#include "Arm64Rec.h"
+#include "Arm64Emitter.h"
 
-
-namespace Interp = R5900::Interpreter::OpcodeImpl::MMI;
 
 namespace R5900 {
 namespace Dynarec {
