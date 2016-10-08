@@ -204,6 +204,7 @@ static const int __pagesize	= PCSX2_PAGESIZE;
 // warnings when a static inlined function isn't used in the scope of a single file (which
 // happens *by design* like all the friggen time >_<)
 
+#ifndef __aarch64__
 #ifndef __fastcall
 #	define __fastcall		__attribute__((fastcall))
 #endif
@@ -219,6 +220,11 @@ static const int __pagesize	= PCSX2_PAGESIZE;
 #	define __threadlocal	__thread
 #	define likely(x)		__builtin_expect(!!(x), 1)
 #	define unlikely(x)		__builtin_expect(!!(x), 0)
+#endif
+#else
+#define __fastcall
+#define _inline
+#define __noinline
 #endif
 
 // --------------------------------------------------------------------------------------
@@ -238,8 +244,14 @@ static const int __pagesize	= PCSX2_PAGESIZE;
 #	define __releaseinline __forceinline
 #endif
 
-#define __ri	__releaseinline
-#define __fi	__forceinline
-#define __fc	__fastcall
+#ifndef __aarch64__
+    #define __ri	__releaseinline
+    #define __fi	__forceinline
+    #define __fc	__fastcall
+#else
+    #define __ri
+    #define __fi
+    #define __fc
+#endif
 
 #endif

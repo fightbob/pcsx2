@@ -18,51 +18,40 @@
 #include "Arm64Emitter.h"
 #include "Arm64Reg.h"
 #include "R5900.h"
+#include "Memory.h"
 
 using namespace Arm64Gen;
 
-// aarch64 has a lot of registers, but no good way to load from some arbitrary address
-// for flushing and loading registers, we need to work with the mips cpu context
-// so just store a pointer to it in some given register, then LDR/STR to/from it whenever
-// we need something. We have 29 registers to allocate... I think we can give one or two up
-// for such usage
-#define MIPS_CPU_CTX_REG W28
-#define MIPS_FPU_CTX_REG W27
-#define MEMORY_BASE_REG W26
 
-//we need everything in cpu and fpu regs to be within a offset of the beginning so that
-// aarch64 instructions can reach them. That shouldn't be an issue
-static_assert(sizeof(cpuRegs) < 16380, "cpuRegs is too big!");
-static_assert(sizeof(fpuRegs) < 16380, "fpuRegs is too big!");
 
 const std::array<ARM64Reg,26> aarch64_reg_alloc_order =
 {
-  W0,
-  W1,
-  W2,
-  W3,
-  W4,
-  W5,
-  W6,
-  W7,
-  W8,
-  W9,
-  W10,
-  W11,
-  W12,
-  W13,
-  W14,
-  W15,
-  W16,
-  W17,
-  W18,
-  W19,
-  W20,
-  W21,
-  W22,
-  W23,
-  W24,
-  W25
+    W19,
+    W20,
+    W21,
+    W22,
+    W23,
+    W24,
+    W25,
+    W18,
+    W17,
+    W16,
+    W15,
+    W14,
+    W13,
+    W12,
+    W11,
+    W10,
+    W9,
+    W8,
+    W7,
+    W6,
+    W5,
+    W4,
+    W3,
+    W2,
+    W1,
+    W0
 };
 
 const std::array<ARM64Reg,10> aarch64_callee_saved_regs =
@@ -92,9 +81,9 @@ constexpr bool aarch64_is_callee_saved_register(ARM64Reg reg)
 int aarch64_get_num_temp_regs_in_use()
 {
     int in_use = 0;
-    for (reg_status_e status : aarch64_current_reg_status)
+    for (const auto& status : aarch64_current_reg_status)
     {
-        if (status == reg_status_e::USED)
+        if (status.second == reg_status_e::USED)
         {
             in_use++;
         }
@@ -186,3 +175,121 @@ void aarch64_flush_all_regs()
         }
     }
 }
+
+void aarch64_flush_and_unmap_all_regs()
+{
+    for (const auto& mapping : aarch64_current_reg_mapping)
+    {
+        if (mapping.second != mips_reg_e::INVALID)
+        {
+            aarch64_flush_to_mips_ctx(mapping.second, mapping.first);
+            aarch64_unmap_reg(mapping.first, mapping.second);
+        }
+    }
+}
+
+void aarch64_load_all_mapped_regs()
+{
+    for (const auto& mapping : aarch64_current_reg_mapping)
+    {
+        if (mapping.second != mips_reg_e::INVALID)
+        {
+            aarch64_load_from_mips_ctx(mapping.second, mapping.first);
+        }
+    }
+}
+
+void aarch64_flush_callee_saved_regs()
+{
+    for (const auto& mapping : aarch64_current_reg_mapping)
+    {
+        if (mapping.second != mips_reg_e::INVALID && aarch64_is_callee_saved_register(mapping.first))
+        {
+            aarch64_flush_to_mips_ctx(mapping.second, mapping.first);
+        }
+    }
+}
+
+
+
+/*TODO: make all of this variadic templates and what not with this new fangled c++11 */
+
+typedef void(*thunk_func_f)();
+
+u8 thunk_mem_read_8(u32 addr)
+{
+    return memRead8(addr);
+}
+u16 thunk_mem_read_16(u32 addr)
+{
+    return memRead16(addr);
+}
+u32 thunk_mem_read_32(u32 addr)
+{
+    return memRead32(addr);
+}
+u64 thunk_mem_read_64(u32 addr)
+{
+    u64 temp;
+    memRead64(addr, &temp);
+    return temp;
+}
+u128 thunk_mem_read_128(u32 addr)
+{
+    u128 temp;
+    memRead128(addr,&temp);
+    return temp;
+}
+
+void thunk_mem_write_8(u32 addr, u8 data)
+{
+    memWrite8(addr, data);
+}
+void thunk_mem_write_16(u32 addr, u16 data)
+{
+    memWrite16(addr, data);
+}
+void thunk_mem_write_32(u32 addr, u32 data)
+{
+    memWrite32(addr,data);
+}
+void thunk_mem_write_64(u32 addr, u64 data)
+{
+    memWrite64(addr, data);
+}
+void thunk_mem_write_128(u32 addr, u128 data)
+{
+    memWrite128(addr,data);
+}
+
+void thunk_interpret(opcode_t op)
+{
+    //TODO: is PC updated here? update PC here. Or update before
+    u32 pc = cpuRegs.pc;
+    cpuRegs.pc += 4;
+
+    cpuRegs.code = memRead32( pc );
+
+    const OPCODE& opcode = GetInstruction(op.opcode);
+
+    cpuBlockCycles += opcode.cycles;
+
+    opcode.interpret();
+}
+
+
+
+const thunk_funcs_t aarch64_thunk_funcs =
+{
+    thunk_mem_read_8,
+    thunk_mem_read_16,
+    thunk_mem_read_32,
+    thunk_mem_read_64,
+    thunk_mem_read_128,
+    thunk_mem_write_8,
+    thunk_mem_write_16,
+    thunk_mem_write_32,
+    thunk_mem_write_64,
+    thunk_mem_write_128,
+    thunk_interpret
+};

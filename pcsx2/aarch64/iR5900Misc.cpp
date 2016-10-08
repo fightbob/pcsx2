@@ -16,8 +16,8 @@
 #include "PrecompiledHeader.h"
 
 #include "Common.h"
-#include "iR5900.h"
-#include "R5900OpcodeTables.h"
+#include "Arm64Rec.h"
+#include "Arm64Emitter.h"
 
 using namespace x86Emitter;
 

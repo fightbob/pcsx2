@@ -23,7 +23,7 @@
 
 using namespace Arm64Gen;
 
-constexpr int IMM12_MAX = ((1 << 12) - 1);
+
 
 namespace R5900 {
 namespace Dynarec {

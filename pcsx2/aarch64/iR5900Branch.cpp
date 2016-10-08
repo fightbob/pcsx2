@@ -19,10 +19,10 @@
 #include "PrecompiledHeader.h"
 
 #include "Common.h"
-#include "R5900OpcodeTables.h"
-#include "iR5900.h"
+#include "Arm64Rec.h"
+#include "Arm64Emitter.h"
 
-using namespace x86Emitter;
+using namespace Arm64Gen;
 
 namespace R5900 {
 namespace Dynarec {
@@ -32,7 +32,12 @@ namespace OpcodeImpl
 
 void recBEQ(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    s32 offset = op.offset();
 
+    CMP(rs,rt);
+    B
 }
 
 void recBNE(opcode_t op)

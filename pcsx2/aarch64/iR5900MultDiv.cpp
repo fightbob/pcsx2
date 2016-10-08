@@ -16,13 +16,12 @@
 
 #include "PrecompiledHeader.h"
 
+
 #include "Common.h"
-#include "R5900OpcodeTables.h"
-#include "iR5900.h"
+#include "Arm64Rec.h"
+#include "Arm64Emitter.h"
 
-using namespace x86Emitter;
-
-namespace Interp = R5900::Interpreter::OpcodeImpl;
+using namespace Arm64Gen;
 
 namespace R5900 {
 namespace Dynarec {
@@ -30,42 +29,42 @@ namespace OpcodeImpl
 {
 
 
-void recMULT_(int info)
+void recMULT(opcode_t op)
 {
 }
 
-void recMULTU_(int info)
-{
-
-}
-
-void recMULT1_(int info)
+void recMULTU(opcode_t op)
 {
 
 }
 
-
-void recMULTU1_(int info)
-{
-}
-
-void recDIV_(int info)
+void recMULT1(opcode_t op)
 {
 
 }
 
 
-void recDIVU_(int info)
+void recMULTU1(opcode_t op)
+{
+}
+
+void recDIV(opcode_t op)
 {
 
 }
 
-void recDIV1_(int info)
+
+void recDIVU(opcode_t op)
 {
 
 }
 
-void recDIVU1_(int info)
+void recDIV1(opcode_t op)
+{
+
+}
+
+void recDIVU1(opcode_t op)
 {
 
 }

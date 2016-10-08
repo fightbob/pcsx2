@@ -16,29 +16,84 @@
 
 #include "PrecompiledHeader.h"
 
+
 #include "Common.h"
-#include "R5900OpcodeTables.h"
-#include "iR5900LoadStore.h"
-#include "iR5900.h"
+#include "Arm64Rec.h"
+#include "Arm64Emitter.h"
+
+using namespace Arm64Gen;
 
 namespace R5900 {
 namespace Dynarec {
 namespace OpcodeImpl {
 
-void recLB()  { }
-void recLBU() { }
-void recLH()  { }
-void recLHU() { }
-void recLW()  { }
-void recLWU() { }
-void recLD()  { }
-void recLQ()  { }
+void recLB(opcode_t op)
+{
+    ARM64Reg base = aarch64_get_mapped_reg(op.base());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    u32 imm = op.uimm16();
 
-void recSB()  { }
-void recSH()  { }
-void recSW()  { }
-void recSQ()  { }
-void recSD()  { }
+    //TODO: some optimization can be done with immediates that are 12 bits or
+    //fewer, but those can come later and will really only be useful when we
+    //are doing reads and writes in the dynarec, rather than calling back into
+    //the aarch64 thunk
+
+    ARM64Reg temp_reg = aarch64_get_free_reg();
+    MOVZ(temp_reg, imm);
+    SXTH(EncodeRegTo32(temp_reg), EncodeRegTo32(temp_reg));
+    ADD(temp_reg, base, temp_reg);
+    //at this point, temp_reg has the ps2_addr_t we want to read from
+
+}
+void recLBU()
+{
+
+}
+void recLH()
+{
+
+}
+void recLHU()
+{
+
+}
+void recLW()
+{
+
+}
+void recLWU()
+{
+
+}
+void recLD()
+{
+
+}
+void recLQ()
+{
+
+}
+
+void recSB()
+{
+
+}
+void recSH()
+{
+
+}
+void recSW()
+{
+
+}
+void recSQ()
+{
+
+}
+void recSD()
+{
+
+}
 
 
 void recLWL()
@@ -93,6 +148,3 @@ void recSQC2()
 
 
 } } }	// end namespace R5900::Dynarec::OpcodeImpl
-
-using namespace R5900::Dynarec;
-using namespace R5900::Dynarec::OpcodeImpl;

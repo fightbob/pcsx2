@@ -18,7 +18,23 @@
 #include "Arm64Emitter.h"
 #include "R5900.h"
 
+// aarch64 has a lot of registers, but no good way to load from some arbitrary address
+// for flushing and loading registers, we need to work with the mips cpu context
+// so just store a pointer to it in some given register, then LDR/STR to/from it whenever
+// we need something. We have 29 registers to allocate... I think we can give one or two up
+// for such usage
+#define MIPS_CPU_CTX_REG W28
+#define MIPS_FPU_CTX_REG W27
+#define EMU_THUNK_REG W26
+
+//we need everything in cpu and fpu regs to be within a offset of the beginning so that
+// aarch64 instructions can reach them. That shouldn't be an issue
+static_assert(sizeof(cpuRegs) < 16380, "cpuRegs is too big!");
+static_assert(sizeof(fpuRegs) < 16380, "fpuRegs is too big!");
+
 #define MIPS_CPU_CTX_OFFSET(elem) (offsetof(cpuRegs,elem))
+
+constexpr int IMM12_MAX = ((1 << 12) - 1);
 
 //TODO: move this somewhere better
 struct opcode_t
@@ -35,6 +51,21 @@ struct opcode_t
 	u32 sa() { return (opcode >> 6) & 0x1f; }
 	u32 jmp(u32 pc) { return (pc & 0xf0000000) | ((opcode & 0x03ffffff) << 2); }
 	u32 base() { return rs(); }
+};
+
+struct thunk_funcs_t
+{
+    u8(*read_8_func)(u32);
+    u16(*read_16_func)(u32);
+    u32(*read_32_func)(u32);
+    u64(*read_64_func)(u32);
+    u128(*read_128_func)(u32);
+    void(*read_8_func)(u32,u8);
+    void(*read_16_func)(u32,u16);
+    void(*read_32_func)(u32,u32);
+    void(*read_64_func)(u32,u64);
+    void(*read_128_func)(u32,u128);
+    void(*interpret_func)(opcode_t);
 };
 
 enum class mips_reg_e
@@ -83,6 +114,21 @@ enum class reg_status_e
     MAPPED = 0x2, // the arm reg is mapped to a mips reg
 };
 
+enum class thunk_op_e
+{
+    READ_8,
+    READ_16,
+    READ_32,
+    READ_64,
+    READ_128,
+    WRITE_8,
+    WRITE_16,
+    WRITE_32,
+    WRITE_64,
+    WRITE_128,
+    INTERPRET
+};
+
 
 constexpr bool aarch64_is_callee_saved_register(ARM64Reg reg);
 
@@ -105,3 +151,23 @@ void aarch64_load_from_mips_ctx(mips_reg_e mips_reg, ARM64Reg arm_reg);
 void aarch64_flush_to_mips_ctx(mips_reg_e mips_reg, ARM64Reg arm_reg);
 
 void aarch64_flush_all_regs();
+
+void aarch64_flush_and_unmap_all_regs();
+
+void aarch64_load_all_mapped_regs();
+
+void aarch64_flush_callee_saved_regs();
+
+void aarch64_thunk();
+
+u8 thunk_mem_read_8(u32 addr);
+u16 thunk_mem_read_16(u32 addr);
+u32 thunk_mem_read_32(u32 addr);
+u64 thunk_mem_read_64(u32 addr);
+u128 thunk_mem_read_128(u32 addr);
+void thunk_mem_write_8(u32 addr, u8 data);
+void thunk_mem_write_16(u32 addr, u16 data);
+void thunk_mem_write_32(u32 addr, u32 data);
+void thunk_mem_write_64(u32 addr, u64 data);
+void thunk_mem_write_128(u32 addr, u128 data);
+void thunk_interpret(opcode_t op);
