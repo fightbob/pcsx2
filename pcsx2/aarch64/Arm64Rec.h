@@ -159,6 +159,12 @@ void aarch64_load_all_mapped_regs();
 
 void aarch64_flush_caller_saved_regs();
 
+void aarch64_recompile_instr(opcode_t op);
+
+void aarch64_recompile_instr_at_addr(u32 ps2_addr);
+
+void aarch64_recompile_next_instr();
+
 u8 thunk_mem_read_8(u32 addr);
 u16 thunk_mem_read_16(u32 addr);
 u32 thunk_mem_read_32(u32 addr);

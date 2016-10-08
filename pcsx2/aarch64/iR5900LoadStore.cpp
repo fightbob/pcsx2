@@ -156,7 +156,7 @@ void recLB(opcode_t op)
 void recLBU()
 {
     ARM64Reg rt = rec_load<u8>(op);
-    UXTB(rt,rt);
+    UXTB(rt,rt); //todo: necessary?
 }
 
 void recLH()
@@ -168,7 +168,7 @@ void recLH()
 void recLHU()
 {
     ARM64Reg rt = rec_load<u16>(op);
-    UXTB(rt,rt);
+    UXTH(rt,rt); // todo: necessary?
 }
 
 void recLW()

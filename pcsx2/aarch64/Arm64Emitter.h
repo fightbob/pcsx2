@@ -15,7 +15,7 @@
 namespace Arm64Gen
 {
 
-enum CCFlags
+enum class CCFlags
 {
     CC_EQ = 0,      // Equal
     CC_NEQ,         // Not equal
@@ -34,8 +34,34 @@ enum CCFlags
     CC_AL,          // Always (unconditional) 14
     CC_HS = CC_CS,  // Alias of CC_CS  Unsigned higher or same
     CC_LO = CC_CC,  // Alias of CC_CC  Unsigned lower
+    CC_NEVER = -1;
 };
 const u32 NO_COND = 0xE0000000;
+
+inline CCFlags& operator !(CCflags& cc)
+{
+    switch (cc)
+    {
+        case CC_EQ: return CC_NEQ;        // Equal
+        case CC_NEQ: return CC_EQ;        // Not equal
+        case CC_CS: return CC_CC;         // Carry Set
+        case CC_CC: return CC_CS;         // Carry Clear
+        case CC_MI: return CC_PL;         // Minus (Negative)
+        case CC_PL: return CC_MI;         // Plus
+        case CC_VS: return CC_VC;         // Overflow
+        case CC_VC: return CC_CS;         // No Overflow
+        case CC_HI: return CC_LS;         // Unsigned higher
+        case CC_LS: return CC_HI;         // Unsigned lower or same
+        case CC_GE: return CC_LT;         // Signed greater than or equal
+        case CC_LT: return CC_GE;         // Signed less than
+        case CC_GT: return CC_LE;         // Signed greater than
+        case CC_LE: return CC_GT;         // Signed less than or equal
+        case CC_AL: return CC_NEVER;      // Always (unconditional) 14
+        case CC_HS: return CC_LO;         // Alias of CC_CS  Unsigned higher or same
+        case CC_LO: return CC_HS;         // Alias of CC_CC  Unsigned lower
+        default: return CC_NEVER;
+    }
+}
 
 // X30 serves a dual purpose as a link register
 // Encoded as <u3:type><u5:reg>

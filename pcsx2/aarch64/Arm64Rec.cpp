@@ -210,6 +210,22 @@ void aarch64_flush_caller_saved_regs()
     }
 }
 
+void aarch64_recompile_instr(opcode_t op)
+{
+
+}
+
+void aarch64_recompile_instr_at_addr(u32 ps2_addr)
+{
+    opcode_t op;
+    op.opcode = memRead32(ps2_addr);
+    aarch64_recompile_instr(op);
+}
+
+void aarch64_recompile_next_instr()
+{
+    aarch64_recompile_instr_at(cpuRegs.pc);
+}
 
 
 /*TODO: make all of this variadic templates and what not with this new fangled c++11 */
