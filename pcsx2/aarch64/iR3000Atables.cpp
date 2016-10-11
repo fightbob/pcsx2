@@ -24,212 +24,333 @@
 
 
 
-void rpsxADDIU()
+void rpsxADDIU(opcode_t op)
+{
+    rpsxADDI(op);
+}
+
+void rpsxADDI(opcode_t op)
+{
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    u32 imm = op.uimm16();
+
+    if (imm <= IMM12_MAX)
+    {
+        ADD(EncodeRegTo32(rt),EncodeRegTo32(rs),imm);
+    }
+    else
+    {
+        ARM64Reg temp_reg = aarch64_get_free_reg();
+        MOVZ(temp_reg,imm);
+        ADD(EncodeRegTo32(rt),EncodeRegTo32(rs),temp_reg);
+        aarch64_free_reg(temp_reg);
+    }
+}
+
+void rpsxSLTI(opcode_t op)
+{
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    u32 imm = op.uimm16();
+
+    ARM64Reg temp_reg = aarch64_get_free_reg();
+    MOVZ(EncodeRegTo32(temp_reg),imm);
+    SXTH(EncodeRegTo32(temp_reg),EncodeRegTo32(temp_reg));
+    CMP(EncodeRegTo32(rs),EncodeRegTo32(temp_reg));
+    CSET(EncodeRegTo32(rt),CC_LT);
+}
+
+void rpsxSLTIU(opcode_t op)
 {
 
 }
 
-void rpsxADDI() { }
-
-void rpsxSLTI() {  }
-
-void rpsxSLTIU() {  }
-
-void rpsxANDI() {  }
-
-void rpsxORI() {  }
-
-
-void rpsxXORI() {  }
-
-void rpsxLUI()
+void rpsxANDI(opcode_t op)
 {
 
 }
 
-void rpsxADDU()
+void rpsxORI(opcode_t op)
 {
 
 }
 
-void rpsxADD() {  }
+void rpsxXORI(opcode_t op)
+{
 
-
-void rpsxSUBU()
-{
-}
-void rpsxSUB() {  }
-void rpsxAND() { }
-void rpsxOR() {  }
-void rpsxXOR() {  }
-void rpsxNOR() { }
-void rpsxSLT()
-{
-}
-void rpsxSLTU()
-{
 }
 
-void rpsxMULT() {  }
-void rpsxMULTU() {  }
-
-void rpsxDIV() {  }
-
-void rpsxDIVU() {  }
-
-
-static void rpsxLB()
+void rpsxLUI(opcode_t op)
 {
+
 }
 
-static void rpsxLBU()
+void rpsxADDU(opcode_t op)
 {
+
 }
 
-static void rpsxLH()
+void rpsxADD(opcode_t op)
 {
+
 }
 
-static void rpsxLHU()
+void rpsxSUBU(opcode_t op)
 {
+
 }
 
-static void rpsxLW()
+void rpsxSUB(opcode_t op)
 {
+
 }
 
-static void rpsxSB()
+void rpsxAND(opcode_t op)
 {
+
+}
+void rpsxOR(opcode_t op)
+{
+
 }
 
-static void rpsxSH()
+void rpsxXOR(opcode_t op)
 {
+
 }
 
-static void rpsxSW()
+void rpsxNOR(opcode_t op)
 {
+
 }
 
-
-void rpsxSLL() {  }
-
-void rpsxSRL() {  }
-
-void rpsxSRA() {  }
-
-void rpsxSLLV()
+void rpsxSLT(opcode_t op)
 {
+
 }
 
-void rpsxSRLV()
+void rpsxSLTU(opcode_t op)
 {
+
 }
 
-void rpsxSRAV()
+void rpsxMULT(opcode_t op)
 {
+
+}
+void rpsxMULTU(opcode_t op)
+{
+
 }
 
-void rpsxMFHI()
+void rpsxDIV(opcode_t op)
 {
+
 }
 
-void rpsxMTHI()
+void rpsxDIVU(opcode_t op)
 {
-}
 
-void rpsxMFLO()
-{
-}
-
-void rpsxMTLO()
-{
-}
-
-void rpsxJ()
-{
-}
-
-void rpsxJAL()
-{
-}
-
-void rpsxJR()
-{
-}
-
-void rpsxJALR()
-{
 }
 
 
-void rpsxBEQ() {  }
-
-void rpsxBNE() {  }
-
-void rpsxBLTZ()
+static void rpsxLB(opcode_t op)
 {
+
 }
 
-void rpsxBGEZ()
+static void rpsxLBU(opcode_t op)
 {
+
 }
 
-void rpsxBLTZAL()
+static void rpsxLH(opcode_t op)
 {
+
 }
 
-void rpsxBGEZAL()
+static void rpsxLHU(opcode_t op)
 {
+
 }
 
-void rpsxBLEZ()
+static void rpsxLW(opcode_t op)
 {
+
 }
 
-void rpsxBGTZ()
+static void rpsxSB(opcode_t op)
 {
+
 }
 
-void rpsxMFC0()
+static void rpsxSH(opcode_t op)
 {
+
 }
 
-void rpsxCFC0()
+static void rpsxSW(opcode_t op)
 {
+
 }
 
-void rpsxMTC0()
+void rpsxSLL(opcode_t op)
 {
+
 }
 
-void rpsxCTC0()
+void rpsxSRL(opcode_t op)
 {
+
 }
 
-void rpsxRFE()
+void rpsxSRA(opcode_t op)
 {
+
+}
+
+void rpsxSLLV(opcode_t op)
+{
+
+}
+
+void rpsxSRLV(opcode_t op)
+{
+
+}
+
+void rpsxSRAV(opcode_t op)
+{
+
+}
+
+void rpsxMFHI(opcode_t op)
+{
+
+}
+
+void rpsxMTHI(opcode_t op)
+{
+
+}
+
+void rpsxMFLO(opcode_t op)
+{
+
+}
+
+void rpsxMTLO(opcode_t op)
+{
+
+}
+
+void rpsxJ(opcode_t op)
+{
+
+}
+
+void rpsxJAL(opcode_t op)
+{
+
+}
+
+void rpsxJR(opcode_t op)
+{
+
+}
+
+void rpsxJALR(opcode_t op)
+{
+
+}
+
+
+void rpsxBEQ(opcode_t op)
+{
+
+}
+
+void rpsxBNE(opcode_t op)
+{
+
+}
+
+void rpsxBLTZ(opcode_t op)
+{
+
+}
+
+void rpsxBGEZ(opcode_t op)
+{
+
+}
+
+void rpsxBLTZAL(opcode_t op)
+{
+
+}
+
+void rpsxBGEZAL(opcode_t op)
+{
+
+}
+
+void rpsxBLEZ(opcode_t op)
+{
+
+}
+
+void rpsxBGTZ(opcode_t op)
+{
+
+}
+
+void rpsxMFC0(opcode_t op)
+{
+
+}
+
+void rpsxCFC0(opcode_t op)
+{
+
+}
+
+void rpsxMTC0(opcode_t op)
+{
+
+}
+
+void rpsxCTC0(opcode_t op)
+{
+
+}
+
+void rpsxRFE(opcode_t op)
+{
+
 }
 
 
 
-extern void (*rpsxBSC[64])();
-extern void (*rpsxSPC[64])();
-extern void (*rpsxREG[32])();
-extern void (*rpsxCP0[32])();
-extern void (*rpsxCP2[64])();
-extern void (*rpsxCP2BSC[32])();
+extern void (*rpsxBSC[64])(opcode_t op);
+extern void (*rpsxSPC[64])(opcode_t op);
+extern void (*rpsxREG[32])(opcode_t op);
+extern void (*rpsxCP0[32])(opcode_t op);
+extern void (*rpsxCP2[64])(opcode_t op);
+extern void (*rpsxCP2BSC[32])(opcode_t op);
 
-static void rpsxSPECIAL() { rpsxSPC[_Funct_](); }
-static void rpsxREGIMM() { rpsxREG[_Rt_](); }
-static void rpsxCOP0() { rpsxCP0[_Rs_](); }
-static void rpsxCOP2() { rpsxCP2[_Funct_](); }
-static void rpsxBASIC() { rpsxCP2BSC[_Rs_](); }
+static void rpsxSPECIAL(opcode_t op) { rpsxSPC[_Funct_](); }
+static void rpsxREGIMM(opcode_t op) { rpsxREG[_Rt_](); }
+static void rpsxCOP0(opcode_t op) { rpsxCP0[_Rs_](); }
+static void rpsxCOP2(opcode_t op) { rpsxCP2[_Funct_](); }
+static void rpsxBASIC(opcode_t op) { rpsxCP2BSC[_Rs_](); }
 
-static void rpsxNULL() {
+static void rpsxNULL(opcode_t op) {
 	Console.WriteLn("psxUNK: %8.8x", psxRegs.code);
 }
 
-void (*rpsxBSC[64])() = {
+void (*rpsxBSC[64])(opcode_t op) = {
 	rpsxSPECIAL, rpsxREGIMM, rpsxJ   , rpsxJAL  , rpsxBEQ , rpsxBNE , rpsxBLEZ, rpsxBGTZ,
 	rpsxADDI   , rpsxADDIU , rpsxSLTI, rpsxSLTIU, rpsxANDI, rpsxORI , rpsxXORI, rpsxLUI ,
 	rpsxCOP0   , rpsxNULL  , rpsxCOP2, rpsxNULL , rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL,
@@ -240,7 +361,7 @@ void (*rpsxBSC[64])() = {
 	rpsxNULL   , rpsxNULL  , rgteSWC2, rpsxNULL , rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL
 };
 
-void (*rpsxSPC[64])() = {
+void (*rpsxSPC[64])(opcode_t op) = {
 	rpsxSLL , rpsxNULL, rpsxSRL , rpsxSRA , rpsxSLLV   , rpsxNULL , rpsxSRLV, rpsxSRAV,
 	rpsxJR  , rpsxJALR, rpsxNULL, rpsxNULL, rpsxSYSCALL, rpsxBREAK, rpsxNULL, rpsxNULL,
 	rpsxMFHI, rpsxMTHI, rpsxMFLO, rpsxMTLO, rpsxNULL   , rpsxNULL , rpsxNULL, rpsxNULL,
@@ -251,21 +372,21 @@ void (*rpsxSPC[64])() = {
 	rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL   , rpsxNULL , rpsxNULL, rpsxNULL
 };
 
-void (*rpsxREG[32])() = {
+void (*rpsxREG[32])(opcode_t op) = {
 	rpsxBLTZ  , rpsxBGEZ  , rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL,
 	rpsxNULL  , rpsxNULL  , rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL,
 	rpsxBLTZAL, rpsxBGEZAL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL,
 	rpsxNULL  , rpsxNULL  , rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL
 };
 
-void (*rpsxCP0[32])() = {
+void (*rpsxCP0[32])(opcode_t op) = {
 	rpsxMFC0, rpsxNULL, rpsxCFC0, rpsxNULL, rpsxMTC0, rpsxNULL, rpsxCTC0, rpsxNULL,
 	rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL,
 	rpsxRFE , rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL,
 	rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL
 };
 
-void (*rpsxCP2[64])() = {
+void (*rpsxCP2[64])(opcode_t op) = {
 	rpsxBASIC, rgteRTPS , rpsxNULL , rpsxNULL, rpsxNULL, rpsxNULL , rgteNCLIP, rpsxNULL, // 00
 	rpsxNULL , rpsxNULL , rpsxNULL , rpsxNULL, rgteOP  , rpsxNULL , rpsxNULL , rpsxNULL, // 08
 	rgteDPCS , rgteINTPL, rgteMVMVA, rgteNCDS, rgteCDP , rpsxNULL , rgteNCDT , rpsxNULL, // 10
@@ -276,7 +397,7 @@ void (*rpsxCP2[64])() = {
 	rpsxNULL , rpsxNULL , rpsxNULL , rpsxNULL, rpsxNULL, rgteGPF  , rgteGPL  , rgteNCCT  // 38
 };
 
-void(*rpsxCP2BSC[32])() = {
+void(*rpsxCP2BSC[32])(opcode_t op) = {
 	rgteMFC2, rpsxNULL, rgteCFC2, rpsxNULL, rgteMTC2, rpsxNULL, rgteCTC2, rpsxNULL,
 	rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL,
 	rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL, rpsxNULL,

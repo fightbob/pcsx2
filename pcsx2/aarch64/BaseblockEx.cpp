@@ -22,7 +22,16 @@
 class BasicBlock
 {
     uintptr entry;
-
 };
 
-std::map<u32, BasicBlock> aarch64_basic_block_mapping;
+std::map<u32, BasicBlock*> aarch64_basic_block_mapping;
+
+bool is_branch_op(opcode_t op)
+{
+    //TODO
+}
+
+void aarch64_recompile_block(u32 start_pc)
+{
+
+}

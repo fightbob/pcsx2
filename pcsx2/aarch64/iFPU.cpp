@@ -17,42 +17,17 @@
 #include "PrecompiledHeader.h"
 
 #include "Common.h"
-#include "R5900OpcodeTables.h"
-#include "iR5900.h"
-#include "iFPU.h"
+#include "Arm64Rec.h"
+#include "Arm64Emitter.h"
+#include "Arm64NeonRec.h"
+
+using namespace Arm64Gen;
 
 namespace R5900 {
 namespace Dynarec {
 namespace OpcodeImpl {
 namespace COP1 {
 
-namespace DOUBLE {
-
-void recABS_S();
-void recADD_S();
-void recADDA_S();
-void recC_EQ();
-void recC_LE();
-void recC_LT();
-void recCVT_S();
-void recCVT_W();
-void recDIV_S();
-void recMADD_S();
-void recMADDA_S();
-void recMAX_S();
-void recMIN_S();
-void recMOV_S();
-void recMSUB_S();
-void recMSUBA_S();
-void recMUL_S();
-void recMULA_S();
-void recNEG_S();
-void recSUB_S();
-void recSUBA_S();
-void recSQRT_S();
-void recRSQRT_S();
-
-};
 
 // FCR31 Flags
 #define FPUflagC	0X00800000
@@ -65,138 +40,159 @@ void recRSQRT_S();
 #define FPUflagSO	0X00000010
 #define FPUflagSU	0X00000008
 
+//TODO: flags
 
-void recCFC1()
+void recCFC1(opcode_t op)
 {
 
 }
 
-void recCTC1()
+void recCTC1(opcode_t op)
 {
 
 }
 
-void recMFC1()
-{
-	
-}
-
-void recMTC1()
-{
-	
-}
-void recABS_S()
+void recMFC1(opcode_t op)
 {
 
 }
 
-void recADD_S()
-{
-}
-
-void recADDA_S()
-{
-}
-
-void recBC1F()
-{
-}
-
-void recBC1T()
-{
-}
-
-void recBC1FL()
-{
-}
-
-void recBC1TL()
-{
-}
-
-void recC_EQ()
+void recMTC1(opcode_t op)
 {
 
 }
+void recABS_S(opcode_t op)
+{
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
 
-void recC_F()
+    FABS(EncodeRegToSingle(fd),fs);
+}
+
+void recADD_S(opcode_t op)
+{
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
+    ARM64Reg ft = neon_get_mapped_reg(op.ft());
+
+    FADD(EncodeRegToSingle(fd),fs,ft);
+}
+
+void recADDA_S(opcode_t op)
+{
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+    ARM64Reg ft = neon_get_mapped_reg(op.ft());
+    ARM64Reg acc = neon_get_mapped_reg(mips_reg_e::ACC);
+
+    FADD(EncodeRegToSingle(acc),fs,ft);
+}
+
+void recBC1F(opcode_t op)
+{
+
+}
+
+void recBC1T(opcode_t op)
 {
 }
 
-void recC_LE()
+void recBC1FL(opcode_t op)
 {
 }
 
-void recC_LT()
-{
-}
-void recCVT_S()
+void recBC1TL(opcode_t op)
 {
 }
 
-void recCVT_W()
+void recC_EQ(opcode_t op)
+{
+
+}
+
+void recC_F(opcode_t op)
 {
 }
 
-void recDIV_S()
+void recC_LE(opcode_t op)
 {
 }
 
-void recMADD_S()
+void recC_LT(opcode_t op)
+{
+}
+void recCVT_S(opcode_t op)
 {
 }
 
-void recMADDA_S()
+void recCVT_W(opcode_t op)
 {
 }
 
-void recMAX_S()
+void recDIV_S(opcode_t op)
+{
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
+    ARM64Reg ft = neon_get_mapped_reg(op.ft());
+
+
+}
+
+void recMADD_S(opcode_t op)
+{
+
+}
+
+void recMADDA_S(opcode_t op)
 {
 }
 
-void recMIN_S()
+void recMAX_S(opcode_t op)
 {
 }
 
-void recMOV_S()
+void recMIN_S(opcode_t op)
 {
 }
 
-void recMSUB_S()
+void recMOV_S(opcode_t op)
 {
 }
 
-void recMSUBA_S()
+void recMSUB_S(opcode_t op)
 {
 }
 
-void recMUL_S()
+void recMSUBA_S(opcode_t op)
 {
 }
 
-
-void recMULA_S()
-{
-}
-
-void recNEG_S() 
-{
-}
-
-void recSUB_S()
-{
-}
-
-void recSUBA_S()
-{
-}
-
-void recSQRT_S()
+void recMUL_S(opcode_t op)
 {
 }
 
 
-void recRSQRT_S()
+void recMULA_S(opcode_t op)
+{
+}
+
+void recNEG_S(opcode_t op)
+{
+}
+
+void recSUB_S(opcode_t op)
+{
+}
+
+void recSUBA_S(opcode_t op)
+{
+}
+
+void recSQRT_S(opcode_t op)
+{
+}
+
+
+void recRSQRT_S(opcode_t op)
 {
 }
 

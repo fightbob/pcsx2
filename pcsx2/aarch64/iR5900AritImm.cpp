@@ -111,7 +111,7 @@ void recANDI(opcode_t op)
 {
     ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
     ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
-    u32 imm = op.uimm16();
+    s32 imm = op.simm16();
 
     if (imm <= IMM12_MAX)
     {

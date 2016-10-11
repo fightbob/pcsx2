@@ -23,8 +23,22 @@
 using namespace Arm64Gen;
 
 
+const std::array<ARM64Reg,10> aarch64_callee_saved_regs =
+{
+  W19,
+  W20,
+  W21,
+  W22,
+  W23,
+  W24,
+  W25,
+  W26,
+  W27,
+  W28
+};
 
-const std::array<ARM64Reg,26> aarch64_reg_alloc_order =
+//LRU for keeping track of what register to allocate next
+std::deque<ARM64Reg> aarch64_reg_alloc_lru =
 {
     W19,
     W20,
@@ -54,20 +68,6 @@ const std::array<ARM64Reg,26> aarch64_reg_alloc_order =
     W0
 };
 
-const std::array<ARM64Reg,10> aarch64_callee_saved_regs =
-{
-  W19,
-  W20,
-  W21,
-  W22,
-  W23,
-  W24,
-  W25,
-  W26,
-  W27,
-  W28
-};
-
 std::map<Arm64Reg, mips_reg_e> aarch64_current_reg_mapping;
 std::map<Arm64Reg, reg_status_e> aarch64_current_reg_status;
 
@@ -93,17 +93,22 @@ int aarch64_get_num_temp_regs_in_use()
 
 ARM64Reg aarch64_get_free_reg()
 {
-	for (ARM64Reg reg : aarch64_reg_alloc_order)
-	{
-		if (aarch64_current_reg_status[reg] == reg_status_e::UNUSED)
-		{
+    ARM64Reg arm_reg = aarch64_reg_alloc_lru.pop_front();
+
+    switch(aarch64_current_reg_status[reg])
+    {
+        case reg_status_e::UNUSED:
             aarch64_current_reg_status[arm_reg] = reg_status_e::USED;
-		    return reg;
-		}
-	}
-	//TODO: this is a possibility but will take more code. Handle it when we run into it
-	assert(false);
-	return ARM64Reg::INVALID_REG;
+            break;
+        case reg_status_e::USED:
+            // TODO: what to do? Case is very unlikley
+            break;
+        case reg_status_e::MAPPED:
+            aarch64_unmap_reg(arm_reg, aarch64_current_reg_mapping[arm_reg]);
+            aarch64_current_reg_status[arm_reg] = reg_status_e::USED;
+    }
+    aarch64_reg_alloc_lru.push_back(arm_reg);
+    return arm_reg;
 }
 
 void aarch64_free_reg(ARM64Reg reg)
@@ -137,6 +142,8 @@ void aarch64_unmap_reg(ARM64Reg arm_reg, mips_reg_e mips_reg)
     aarch64_flush_to_mips_ctx(mips_reg, arm_reg);
 }
 
+
+
 ARM64Reg aarch64_get_mapped_reg(mips_reg_e mips_reg)
 {
     assert(mips_reg != mips_reg_e::INVALID);
@@ -155,14 +162,31 @@ ARM64Reg aarch64_get_mapped_reg(mips_reg_e mips_reg)
 	return arm_reg;
 }
 
-void aarch64_load_from_mips_ctx(mips_reg_e mips_reg, ARM64Reg arm_reg)
+void aarch64_load_from_mips_ctx(ARM64Reg arm_reg, mips_reg_e mips_reg)
 {
     LDR(INDEX_UNSIGNED, arm_reg, MIPS_CPU_CTX_REG, MIPS_CPU_CTX_REG(GPR.r[mips_reg]));
 }
 
-void aarch64_flush_to_mips_ctx(mips_reg_e mips_reg, ARM64Reg arm_reg)
+void aarch64_flush_to_mips_ctx(ARM64Reg arm_reg, mips_reg_e mips_reg)
 {
     STR(INDEX_UNSIGNED, arm_reg, MIPS_CPU_CTX_REG, MIPS_CPU_CTX_REG(GPR.r[mips_reg]));
+}
+
+void aarch64_flush_to_mips_ctx(ARM64Reg arm_reg)
+{
+    aarch64_flush_to_mips_ctx(arm_reg, aarch64_current_reg_mapping[arm_reg]);
+}
+
+void aarch64_flush_to_mips_ctx(mips_reg_e mips_reg)
+{
+    for (const auto& mapping : aarch64_current_reg_mapping)
+    {
+        if (mapping.second == mips_reg)
+        {
+            aarch64_flush_to_mips_ctx(mapping.first, mips_reg);
+        }
+    }
+    assert(false);
 }
 
 void aarch64_flush_all_regs()

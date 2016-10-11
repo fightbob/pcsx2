@@ -46,6 +46,7 @@
 #include <cstdio>		// stdio.h under c++
 #include <cstdlib>
 #include <cinttypes>	// Printf format
+#include <deque>
 
 // ... and include some ANSI/POSIX C libs that are useful too, just for good measure.
 // (these compile lightning fast with or without PCH, but they never change so
@@ -87,7 +88,7 @@ typedef void FnType_Void();
 typedef FnType_Void* Fnptr_Void;
 
 // --------------------------------------------------------------------------------------
-//  Compiler/OS specific macros and defines 
+//  Compiler/OS specific macros and defines
 // --------------------------------------------------------------------------------------
 
 #if defined(_MSC_VER)

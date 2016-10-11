@@ -40,34 +40,60 @@ void recLUI(opcode_t op)
 
 void recMFHI(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg hi = aarch64_get_mapped_reg(mips_reg_e::HI);
+
+    MOV(EncodeRegTo64(rd),hi);
 }
 
 void recMFLO(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg lo = aarch64_get_mapped_reg(mips_reg_e::LO);
+
+    MOV(EncodeRegTo64(rd),lo);
 }
 
 void recMTHI(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg hi = aarch64_get_mapped_reg(mips_reg_e::HI);
+
+    MOV(EncodeRegTo64(hi), EncodeRegTo64(rs));
 }
 
 void recMTLO(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg hi = aarch64_get_mapped_reg(mips_reg_e::HI);
+
+    MOV(EncodeRegTo64(hi), EncodeRegTo64(rs));
 }
 
 
 void recMFHI1(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    aarch64_load_upper64_from_mips_ctx(mips_reg_e::HI,rd);
 }
 
 void recMFLO1(opcode_t op)
 {
-
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    aarch64_load_upper64_from_mips_ctx(mips_reg_e::LO,rd);
+}
 void recMTHI1(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+
+    aarch64_flush_upper64_to_mips_ctx(mips_reg_e::HI,rs);
 }
 
 void recMTLO1(opcode_t op)
 {
+    ARM64Reg lo = aarch64_get_mapped_reg(op.rs());
+
+    aarch64_flush_upper64_to_mips_ctx(mips_reg_e::LO,rs);
 }
 
 

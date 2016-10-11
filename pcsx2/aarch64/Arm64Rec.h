@@ -33,6 +33,7 @@ static_assert(sizeof(cpuRegs) < 16380, "cpuRegs is too big!");
 static_assert(sizeof(fpuRegs) < 16380, "fpuRegs is too big!");
 
 #define MIPS_CPU_CTX_OFFSET(elem) (offsetof(cpuRegs,elem))
+#define MIPS_FPU_CTX_OFFSET(elem) (offsetof(fpuRegs,elem))
 #define THUNK_FUNCS_OFFSET(elem)  (offsetof(thunk_funcs_t,elem))
 
 constexpr int IMM12_MAX = ((1 << 12) - 1);
@@ -45,6 +46,9 @@ struct opcode_t
 	u32 rd() { return (opcode >> 11) & 0x1f; }
 	u32 rs() { return (opcode >> 21) & 0x1f; }
 	u32 rt() { return (opcode >> 16) & 0x1f; }
+    u32 fs() { return rd(); }
+    u32 fd() { return sa(); }
+    u32 ft() { return rt(); }
 	u32 func() { return opcode & 0x3f; }
 	s16 simm16() { return (s16)opcode; }
 	u16 uimm16() { return (u16)opcode; }
@@ -105,6 +109,41 @@ enum class mips_reg_e
     R31,
     LO,
     HI,
+    F0,
+    F1,
+    F2,
+    F3,
+    F4,
+    F5,
+    F6,
+    F7,
+    F8,
+    F9,
+    F10,
+    F11,
+    F12,
+    F13,
+    F14,
+    F15,
+    F16,
+    F17,
+    F18,
+    F19,
+    F20,
+    F21,
+    F22,
+    F23,
+    F24,
+    F25,
+    F26,
+    F27,
+    F28,
+    F29,
+    F30,
+    F31,
+    ACC,
+    FCR0,
+    FCR31,
     INVALID
 };
 
@@ -113,6 +152,7 @@ enum class reg_status_e
     UNUSED = 0x0, // the arm reg is not in use, available for allocation
     USED = 0x1,   // the arm reg is in use, but not mapped to a mips reg. usage should only last for the duration of the rec func
     MAPPED = 0x2, // the arm reg is mapped to a mips reg
+
 };
 
 enum class thunk_op_e
@@ -150,6 +190,14 @@ ARM64Reg aarch64_get_and_map_reg(mips_reg_e mips_reg);
 void aarch64_load_from_mips_ctx(mips_reg_e mips_reg, ARM64Reg arm_reg);
 
 void aarch64_flush_to_mips_ctx(mips_reg_e mips_reg, ARM64Reg arm_reg);
+
+void aarch64_load_upper64_from_mips_ctx(mips_reg_e mips_reg, ARM64Reg arm_reg);
+
+void aarch64_flush_upper64_to_mips_ctx(mips_reg_e mips_reg, ARM64Reg arm_reg);
+
+void aarch64_flush_to_mips_ctx(ARM64Reg arm_reg);
+
+void aarch64_flush_to_mips_ctx(mips_reg_e mips_reg);
 
 void aarch64_flush_all_regs();
 

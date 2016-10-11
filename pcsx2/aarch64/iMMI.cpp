@@ -23,8 +23,15 @@
 
 #include "Common.h"
 #include "Arm64Rec.h"
+#include "Arm64NeonRec.h"
 #include "Arm64Emitter.h"
 
+//TODO: we need some interop between the aarch64* and neon* to keep track of the liveness of the emulated mips reg
+// i.e. we need to keep track if the most recent usage of a register is in a neon reg or GPR reg and flush (or dont)
+// accordingly. Most of that will live in the neon* / aarch64* functions. These are pretty agnostic to that and
+// should only care about the return value of *_get_mapped_reg
+
+using namespace Arm64Gen;
 
 namespace R5900 {
 namespace Dynarec {
@@ -33,364 +40,589 @@ namespace MMI
 {
 
 
-
-void recPLZCW()
-{
-}
-
-void recPMFHL()
-{
-}
-
-void recPMTHL()
-{
-}
-
-void recPSRLH()
-{
-}
-
-void recPSRLW()
-{
-}
-
-void recPSRAH()
-{
-}
-
-void recPSRAW()
-{
-}
-
-void recPSLLH()
-{
-}
-
-void recPSLLW()
-{
-}
-
-void recPMAXW()
-{
-}
-
-void recPPACW()
-{
-}
-
-void recPPACH()
-{
-}
-
-void recPPACB()
-{
-}
-
-void recPEXT5()
-{
-}
-
-void recPPAC5()
-{
-}
-
-void recPMAXH()
-{
-}
-
-void recPCGTB()
-{
-}
-
-void recPCGTH()
-{
-}
-
-void recPCGTW()
-{
-}
-
-void recPADDSB()
-{
-}
-
-void recPADDSH()
-{
-}
-
-//NOTE: check kh2 movies if changing this
-void recPADDSW()
-{
-}
-
-void recPSUBSB()
-{
-}
-
-void recPSUBSH()
-{
-}
-
-//NOTE: check kh2 movies if changing this
-void recPSUBSW()
-{
-}
-
-void recPADDB()
+void recPLZCW(opcode_t op)
 {
 
 }
 
-void recPADDH()
+void recPMFHL(opcode_t op)
 {
 }
 
-void recPADDW()
+void recPMTHL(opcode_t op)
 {
 }
 
-void recPSUBB()
+void recPSRLH(opcode_t op)
 {
 }
 
-void recPSUBH()
+void recPSRLW(opcode_t op)
 {
 }
 
-void recPSUBW()
+void recPSRAH(opcode_t op)
 {
 }
 
-void recPEXTLW()
+void recPSRAW(opcode_t op)
 {
 }
 
-void recPEXTLB()
+void recPSLLH(opcode_t op)
 {
 }
 
-void recPEXTLH()
+void recPSLLW(opcode_t op)
+{
+}
+
+void recPMAXW(opcode_t op)
+{
+}
+
+void recPPACW(opcode_t op)
+{
+}
+
+void recPPACH(opcode_t op)
+{
+}
+
+void recPPACB(opcode_t op)
+{
+}
+
+void recPEXT5(opcode_t op)
+{
+}
+
+void recPPAC5(opcode_t op)
+{
+}
+
+void recPMAXH(opcode_t op)
+{
+}
+
+void recPCGTB(opcode_t op)
+{
+}
+
+void recPCGTH(opcode_t op)
+{
+}
+
+void recPCGTW(opcode_t op)
+{
+}
+
+void recPADDSB(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    SQADD(rd,rs,rt,simd_size_e::bytes_16);
+}
+
+void recPADDSH(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    SQADD(rd,rs,rt,simd_size_e::halves_8);
+}
+
+void recPADDSW(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    SQADD(rd,rs,rt,simd_size_e::words_4);
+}
+
+void recPSUBSB(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    SQSUB(rd,rs,rt,simd_size_e::bytes_16);
+}
+
+void recPSUBSH(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    SQSUB(rd,rs,rt,simd_size_e::halves_8);
+}
+
+void recPSUBSW(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    SQSUB(rd,rs,rt,simd_size_e::words_4);
+}
+
+void recPADDB(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    ADDP(rd,rs,rt,simd_size_e::bytes_16);
+}
+
+void recPADDH(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    ADDP(rd,rs,rt,simd_size_e::halves_8);
+}
+
+void recPADDW(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    ADDP(rd,rs,rt,simd_size_e::words_4);
+}
+
+void recPSUBB(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    SUBP(rd,rs,rt,simd_size_e::bytes_16);
+}
+
+void recPSUBH(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    SUBP(rd,rs,rt,simd_size_e::halves_8);
+}
+
+void recPSUBW(opcode_t op)
+{
+
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    SUBP(rd,rs,rt,simd_size_e::words_4);
+}
+
+void recPEXTLW(opcode_t op)
+{
+}
+
+void recPEXTLB(opcode_t op)
+{
+}
+
+void recPEXTLH(opcode_t op)
 {
 }
 
 
-void recPABSW() //needs clamping
+void recPABSW(opcode_t op) //needs clamping
 {
 }
 
 
-void recPABSH()
+void recPABSH(opcode_t op)
 {
 }
 
-void recPMINW()
+void recPMINW(opcode_t op)
 {
 }
 
-void recPADSBH()
+void recPADSBH(opcode_t op)
 {
 }
 
-void recPADDUW()
+void recPADDUW(opcode_t op)
 {
 }
 
-void recPSUBUB()
+void recPSUBUB(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    UQSUB(rd,rs,rt,simd_size_e::bytes_16);
+}
+
+void recPSUBUH(opcode_t op)
+{
+
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    UQSUB(rd,rs,rt,simd_size_e::words_8);
+}
+
+void recPSUBUW(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    UQSUB(rd,rs,rt,simd_size_e::words_4);
+}
+
+void recPEXTUH(opcode_t op)
 {
 }
 
-void recPSUBUH()
-{
-}
-
-void recPSUBUW()
-{
-}
-
-void recPEXTUH()
-{
-}
-
-void recQFSRV()
+void recQFSRV(opcode_t op)
 {
 }
 
 
-void recPEXTUB()
+void recPEXTUB(opcode_t op)
 {
 }
 
-void recPEXTUW()
+void recPEXTUW(opcode_t op)
 {
 }
 
-void recPMINH()
+void recPMINH(opcode_t op)
 {
 }
 
-void recPCEQB()
+void recPCEQB(opcode_t op)
 {
 }
 
-void recPCEQH()
+void recPCEQH(opcode_t op)
 {
 }
 
-void recPCEQW()
+void recPCEQW(opcode_t op)
 {
 }
 
-void recPADDUB()
+void recPADDUB(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    UQADD(rd,rs,rt,simd_size_e::bytes_16);
+}
+
+void recPADDUH(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    UQADD(rd,rs,rt,simd_size_e::halves_8);
+}
+
+void recPMADDW(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    UQADD(rd,rs,rt,simd_size_e::words_4);
+}
+
+void recPSLLVW(opcode_t op)
 {
 }
 
-void recPADDUH()
+void recPSRLVW(opcode_t op)
 {
 }
 
-void recPMADDW()
+void recPMSUBW(opcode_t op)
 {
 }
 
-void recPSLLVW()
+void recPMULTW(opcode_t op)
+{
+}
+void recPDIVW(opcode_t op)
 {
 }
 
-void recPSRLVW()
-{
-}
-
-void recPMSUBW()
-{
-}
-
-void recPMULTW()
-{
-}
-void recPDIVW()
-{
-}
-
-void recPDIVBW()
+void recPDIVBW(opcode_t op)
 {
 }
 
 
 //upper word of each doubleword in LO and HI is undocumented/undefined
 //contains the upper multiplication result (before the addition with the lower multiplication result)
-void recPHMADH()
+void recPHMADH(opcode_t op)
 {
 }
 
-void recPMSUBH()
+void recPMSUBH(opcode_t op)
 {
 }
 
 //upper word of each doubleword in LO and HI is undocumented/undefined
 //it contains the NOT of the upper multiplication result (before the substraction of the lower multiplication result)
-void recPHMSBH()
+void recPHMSBH(opcode_t op)
 {
 }
 
-void recPEXEH()
+void recPEXEH(opcode_t op)
 {
 }
 
-void recPREVH()
+void recPREVH(opcode_t op)
 {
 }
 
-void recPINTH()
+void recPINTH(opcode_t op)
 {
 }
 
-void recPEXEW()
+void recPEXEW(opcode_t op)
 {
 }
 
-void recPROT3W()
+void recPROT3W(opcode_t op)
 {
 }
 
-void recPMULTH()
+void recPMULTH(opcode_t op)
 {
 }
 
-void recPMFHI()
+void recPMFHI(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(mips_reg_e::HI);
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg hi = neon_get_mapped_reg(mips_reg_e::HI);
+
+    MOV(rd,hi,simd_size_e::bytes_16);
+}
+
+void recPMFLO(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(mips_reg_e::LO);
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg lo = neon_get_mapped_reg(mips_reg_e::LO);
+
+    MOV(rd,lo,simd_size_e::bytes_16);
+}
+
+void recPAND(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    AND(rd,rs,rt,simd_size_e::bytes_16);
+}
+
+void recPXOR(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    EOR(rd,rs,rt,simd_size_e::bytes_16);
+}
+
+void recPCPYLD(opcode_t op)
 {
 }
 
-void recPMFLO()
+void recPMADDH(opcode_t op)
 {
 }
 
-void recPAND()
-{
-}
-
-void recPXOR()
-{
-}
-
-void recPCPYLD()
-{
-}
-
-void recPMADDH()
-{
-}
-
-void recPSRAVW()
+void recPSRAVW(opcode_t op)
 {
 }
 
 
 
-void recPINTEH()
+void recPINTEH(opcode_t op)
 {
 }
 
-void recPMULTUW()
+void recPMULTUW(opcode_t op)
 {
 }
 
-void recPMADDUW()
+void recPMADDUW(opcode_t op)
 {
 }
 
-void recPDIVUW()
+void recPDIVUW(opcode_t op)
 {
 }
 
-void recPEXCW()
+void recPEXCW(opcode_t op)
 {
 }
 
-void recPEXCH()
+void recPEXCH(opcode_t op)
 {
 }
 
-void recPNOR()
+void recPNOR(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    ORN(rd,rs,rt,simd_size_e::bytes_16);
+}
+
+void recPMTHI(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(mips_reg_e::HI);
+
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg hi = neon_get_mapped_reg(mips_reg_e::HI);
+
+    MOV(hi,rs,simd_size_e::bytes_16);
+}
+
+void recPMTLO(opcode_t op)
+{
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(mips_reg_e::LO);
+
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg lo = neon_get_mapped_reg(mips_reg_e::LO);
+
+    MOV(lo,rs,simd_size_e::bytes_16);
+}
+
+void recPCPYUD(opcode_t op)
 {
 }
 
-void recPMTHI()
+void recPOR(opcode_t op)
 {
+    aarch64_flush_to_mips_ctx(op.rd());
+    aarch64_flush_to_mips_ctx(op.rs());
+    aarch64_flush_to_mips_ctx(op.rt());
+
+    ARM64Reg rd = neon_get_mapped_reg(op.rd());
+    ARM64Reg rs = neon_get_mapped_reg(op.rs());
+    ARM64Reg rt = neon_get_mapped_reg(op.rt());
+
+    ORR(rd,rs,rt,simd_size_e::bytes_16);
 }
 
-void recPMTLO()
-{
-}
-
-void recPCPYUD()
-{
-}
-
-void recPOR()
-{
-}
-
-void recPCPYH()
+void recPCPYH(opcode_t op)
 {
 }
 
