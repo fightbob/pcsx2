@@ -15,14 +15,13 @@
 
 
 #include "PrecompiledHeader.h"
-#include <time.h>
-
-#include "IopCommon.h"
-#include "iR3000A.h"
-#include "IopMem.h"
-#include "IopDma.h"
 
 
+#include "Common.h"
+#include "Arm64Rec.h"
+#include "Arm64Emitter.h"
+
+using namespace Arm64Gen;
 
 void rpsxADDIU(opcode_t op)
 {
@@ -63,76 +62,163 @@ void rpsxSLTI(opcode_t op)
 
 void rpsxSLTIU(opcode_t op)
 {
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    u32 imm = op.uimm16();
 
+    ARM64Reg temp_reg = aarch64_get_free_reg();
+    MOVZ(EncodeRegTo32(temp_reg),imm);
+    SXTH(EncodeRegTo32(temp_reg),EncodeRegTo32(temp_reg));
+    CMP(EncodeRegTo32(rs),EncodeRegTo32(temp_reg));
+    CSET(EncodeRegTo32(rt),CC_LO);
 }
 
 void rpsxANDI(opcode_t op)
 {
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    s32 imm = op.simm16();
 
+    if (imm <= IMM12_MAX)
+    {
+        AND(EncodeRegTo32(rt),EncodeRegTo32(rs),imm);
+    }
+    else
+    {
+        ARM64Reg temp_reg = aarch64_get_free_reg();
+        MOVZ(temp_reg,imm);
+        AND(EncodeRegTo32(rt),EncodeRegTo32(rs),temp_reg);
+        aarch64_free_reg(temp_reg);
+    }
 }
 
 void rpsxORI(opcode_t op)
 {
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    u32 imm = op.uimm16();
 
+    if (imm <= IMM12_MAX)
+    {
+        ORR(EncodeRegTo32(rt),EncodeRegTo32(rs),imm);
+    }
+    else
+    {
+        ARM64Reg temp_reg = aarch64_get_free_reg();
+        MOVZ(temp_reg,imm);
+        ORR(EncodeRegTo32(rt),EncodeRegTo32(rs),temp_reg);
+        aarch64_free_reg(temp_reg);
+    }
 }
 
 void rpsxXORI(opcode_t op)
 {
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    u32 imm = op.uimm16();
 
+    if (imm <= IMM12_MAX)
+    {
+        EOR(EncodeRegTo32(rt),EncodeRegTo32(rs),imm);
+    }
+    else
+    {
+        ARM64Reg temp_reg = aarch64_get_free_reg();
+        MOVZ(temp_reg,imm);
+        EOR(EncodeRegTo32(rt),EncodeRegTo32(rs),temp_reg);
+        aarch64_free_reg(temp_reg);
+    }
 }
 
 void rpsxLUI(opcode_t op)
 {
+    u32 imm = op.uimm16();
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
 
+    MOVZ(EncodeRegTo32(rt), imm, ShiftAmount::SHIFT_16);
 }
 
 void rpsxADDU(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
 
+    ADD(EncodeRegTo32(rd), EncodeRegTo32(rn), EncodeRegTo32(rm));
 }
 
 void rpsxADD(opcode_t op)
 {
-
+    rpsxADD(op);
 }
 
 void rpsxSUBU(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
 
+    SUB(EncodeRegTo32(rd),EncodeRegTo32(rn),EncodeRegTo32(rm));
 }
 
 void rpsxSUB(opcode_t op)
 {
-
+    rpsxSUB(op);
 }
 
 void rpsxAND(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
 
+    AND(EncodeRegTo32(rd), EncodeRegTo32(rn), EncodeRegTo32(rm));
 }
 void rpsxOR(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
 
+    ORR(EncodeRegTo32(rd), EncodeRegTo32(rn), EncodeRegTo32(rm));
 }
 
 void rpsxXOR(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
 
+    EOR(EncodeRegTo32(rd), EncodeRegTo32(rn), EncodeRegTo32(rm));
 }
 
 void rpsxNOR(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
 
+    ORN(EncodeRegTo32(rd), EncodeRegTo32(rn), EncodeRegTo32(rm));
 }
 
 void rpsxSLT(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
 
+    CMP(EncodeRegTo32(rn),EncodeRegTo32(rm));
+    CSET(EncodeRegTo32(rd),CC_LT);
 }
 
 void rpsxSLTU(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rn = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rm = aarch64_get_mapped_reg(op.rt());
 
+    CMP(EncodeRegTo32(rn),EncodeRegTo32(rm));
+    CSET(EncodeRegTo32(rd),CC_LO);
 }
 
 void rpsxMULT(opcode_t op)
@@ -155,94 +241,134 @@ void rpsxDIVU(opcode_t op)
 }
 
 
-static void rpsxLB(opcode_t op)
+void rpsxLB(opcode_t op)
 {
-
+    ARM64Reg rt = rec_load<s8>(op);
+    SXTB(rt,rt);
 }
 
-static void rpsxLBU(opcode_t op)
+void rpsxLBU(opcode_t op)
 {
-
+    ARM64Reg rt = rec_load<u8>(op);
+    UXTB(rt,rt);
 }
 
-static void rpsxLH(opcode_t op)
+void rpsxLH(opcode_t op)
 {
-
+    ARM64Reg rt = rec_load<s16>(op);
+    SXTH(rt,rt);
 }
 
-static void rpsxLHU(opcode_t op)
+void rpsxLHU(opcode_t op)
 {
-
+    ARM64Reg rt = rec_load<u16>(op);
+    UXTH(rt,rt);
 }
 
-static void rpsxLW(opcode_t op)
+void rpsxLW(opcode_t op)
 {
-
+    ARM64Reg rt = rec_load<u32>(op);
 }
 
-static void rpsxSB(opcode_t op)
+void rpsxSB(opcode_t op)
 {
-
+    rec_store<u8>(op);
 }
 
-static void rpsxSH(opcode_t op)
+void rpsxSH(opcode_t op)
 {
-
+    rec_store<u16>(op);
 }
 
-static void rpsxSW(opcode_t op)
+void rpsxSW(opcode_t op)
 {
-
+    rec_store<u32>(op);
 }
 
 void rpsxSLL(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    int sa = op.sa();
 
+    LSL(EncodeRegTo32(rd),rt,sa);
 }
 
 void rpsxSRL(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    int sa = op.sa();
 
+    LSR(EncodeRegTo32(rd),rt,sa);
 }
 
 void rpsxSRA(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
+    int sa = op.sa();
 
+    ASR(EncodeRegTo32(rd),rt,sa);
 }
 
 void rpsxSLLV(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
 
+    LSLV(EncodeRegTo32(rd),rs,rt);
 }
 
 void rpsxSRLV(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
 
+    LSRV(EncodeRegTo32(rd),rs,rt);
 }
 
 void rpsxSRAV(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
 
+    ASRV(EncodeRegTo32(rd),rs,rt);
 }
 
 void rpsxMFHI(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg hi = aarch64_get_mapped_reg(mips_reg_e::HI);
 
+    MOV(EncodeRegTo32(rd),hi);
 }
 
 void rpsxMTHI(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg hi = aarch64_get_mapped_reg(mips_reg_e::HI);
 
+    MOV(EncodeRegTo32(rd),hi);
 }
 
 void rpsxMFLO(opcode_t op)
 {
+    ARM64Reg rd = aarch64_get_mapped_reg(op.rd());
+    ARM64Reg lo = aarch64_get_mapped_reg(mips_reg_e::LO);
 
+    MOV(EncodeRegTo32(rd),lo);
 }
 
 void rpsxMTLO(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg hi = aarch64_get_mapped_reg(mips_reg_e::HI);
 
+    MOV(EncodeRegTo32(hi), EncodeRegTo32(rs));
 }
 
 void rpsxJ(opcode_t op)
@@ -268,42 +394,60 @@ void rpsxJALR(opcode_t op)
 
 void rpsxBEQ(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
 
+    FixupBranch b = rec_branch<ARM64Reg, false, false>(rs,rt,CC_EQ);
 }
 
 void rpsxBNE(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
+    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
 
+    FixupBranch b = rec_branch<ARM64Reg, false, false>(rs,rt,CC_NEQ);
 }
 
 void rpsxBLTZ(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
 
+    FixupBranch b = rec_branch<u32, false, false>(rs,0,CC_LT);
 }
 
 void rpsxBGEZ(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
 
+    FixupBranch b = rec_branch<u32, false, false>(rs,0,CC_GE);
 }
 
 void rpsxBLTZAL(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
 
+    FixupBranch b = rec_branch<u32, true, false>(rs,0,CC_LT);
 }
 
 void rpsxBGEZAL(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
 
+    FixupBranch b = rec_branch<u32, true, false>(rs,0,CC_GE);
 }
 
 void rpsxBLEZ(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
 
+    FixupBranch b = rec_branch<u32, false, false>(rs,0,CC_LE);
 }
 
 void rpsxBGTZ(opcode_t op)
 {
+    ARM64Reg rs = aarch64_get_mapped_reg(op.rs());
 
+    FixupBranch b = rec_branch<u32, false, false>(rs,0,CC_GT);
 }
 
 void rpsxMFC0(opcode_t op)

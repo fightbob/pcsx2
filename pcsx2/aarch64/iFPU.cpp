@@ -106,6 +106,14 @@ void recBC1TL(opcode_t op)
 
 void recC_EQ(opcode_t op)
 {
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
+    ARM64Reg fcr31 = aarch64_get_free_reg(mips_reg_e::FCR31);
+    ARM64Reg temp_reg = aarch64_get_free_reg();
+
+    MOV(temp_reg,fcr31);
+    ORR(temp_reg,temp_reg,)
+    FCMP(fd,fs);
 
 }
 
@@ -148,14 +156,28 @@ void recMADDA_S(opcode_t op)
 
 void recMAX_S(opcode_t op)
 {
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
+    ARM64Reg ft = neon_get_mapped_reg(op.ft());
+
+    FMAX(fd,fs,ft);
 }
 
 void recMIN_S(opcode_t op)
 {
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
+    ARM64Reg ft = neon_get_mapped_reg(op.ft());
+
+    FMIN(fd,fs,ft);
 }
 
 void recMOV_S(opcode_t op)
 {
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+
+    FMOV(fd,fs);
 }
 
 void recMSUB_S(opcode_t op)
@@ -177,23 +199,45 @@ void recMULA_S(opcode_t op)
 
 void recNEG_S(opcode_t op)
 {
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
+
+    FNEG(fd,fs);
 }
 
 void recSUB_S(opcode_t op)
 {
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
+    ARM64Reg ft = neon_get_mapped_reg(op.ft());
+
+    FSUB(EncodeRegToSingle(fd),fs,ft);
 }
 
 void recSUBA_S(opcode_t op)
 {
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+    ARM64Reg ft = neon_get_mapped_reg(op.ft());
+    ARM64Reg acc = neon_get_mapped_reg(mips_reg_e::ACC);
+
+    FSUB(EncodeRegToSingle(acc),fs,ft);
 }
 
 void recSQRT_S(opcode_t op)
 {
+    ARM64Reg ft = neon_get_mapped_reg(op.ft());
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
+
+    FSQRT(EncodeRegToSingle(fd),fs);
 }
 
 
 void recRSQRT_S(opcode_t op)
 {
+    ARM64Reg ft = neon_get_mapped_reg(op.ft());
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
+
+    FRSQRTE(EncodeRegToSingle(fd),fs);
 }
 
 } } } }

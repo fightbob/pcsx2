@@ -21,9 +21,17 @@
 
 class BasicBlock
 {
-    uintptr entry;
+    //basic block is separated into three parts: prologue, actual block, and epilogue
+    // prologue : loads all registers from cpu ctx
+    // actual block: the code that dos the actual emulation
+    // epilogue: code that flushes all registers back to the cpu ctx
+    // in general, we'll ju,p from emulator code to prologue when reenterin a block,
+    // but should be able to link blocks fairly well. eventually we'll need a thunk to
+    // link blocks with similar but not identical reg mappings
+    uintptr_t entry, prologue, epilogue;
 };
 
+//map ps2addr ro basic block
 std::map<u32, BasicBlock*> aarch64_basic_block_mapping;
 
 bool is_branch_op(opcode_t op)

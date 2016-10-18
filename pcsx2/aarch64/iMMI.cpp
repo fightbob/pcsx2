@@ -274,10 +274,6 @@ void recPSUBW(opcode_t op)
     SUBP(rd,rs,rt,simd_size_e::words_4);
 }
 
-void recPEXTLW(opcode_t op)
-{
-}
-
 void recPEXTLB(opcode_t op)
 {
 }
@@ -286,6 +282,9 @@ void recPEXTLH(opcode_t op)
 {
 }
 
+void recPEXTLW(opcode_t op)
+{
+}
 
 void recPABSW(opcode_t op) //needs clamping
 {
@@ -348,16 +347,16 @@ void recPSUBUW(opcode_t op)
     UQSUB(rd,rs,rt,simd_size_e::words_4);
 }
 
-void recPEXTUH(opcode_t op)
-{
-}
-
 void recQFSRV(opcode_t op)
 {
 }
 
 
 void recPEXTUB(opcode_t op)
+{
+}
+
+void recPEXTUH(opcode_t op)
 {
 }
 

@@ -27,124 +27,6 @@ namespace R5900 {
 namespace Dynarec {
 namespace OpcodeImpl {
 
-template <typename T>
-void rec_load(opcode_t op)
-{
-    const int data_size = sizeof(T);
-
-    //TODO: some optimization can be done with immediates that are 12 bits or
-    //fewer, but those can come later and will really only be useful when we
-    //are doing reads and writes in the dynarec, rather than calling back into
-    //the aarch64 thunk
-    ARM64Reg base = aarch64_get_mapped_reg(op.base());
-    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
-    u32 imm = op.uimm16();
-
-    aarch64_flush_caller_saved_regs();
-
-    // at this point, all of the contexts have been flushed back
-    // so write and read to/from X0 - X7 with impunity in order
-    // to pass parameters
-
-    MOVZ(ARM64Reg::W0, imm);
-    SXTH(ARM64Reg::W0, ARM64Reg::W0);
-    ADD(ARM64Reg::W0, base, ARM64Reg::W0);
-
-    ARM64Reg temp_reg = aarch64_get_free_reg();
-
-    // This is a case we actually need to handle... not sure how though
-    // so until then just assert false and handle it when we run into it
-    assert(temp_reg != ARM64Reg::W0);
-
-    switch(data_size)
-    {
-        case 8:
-            ADD(temp_reg, EMU_THUNK_REG,THUNK_FUNCS_OFFSET(read_8_func));
-            break;
-        case 16:
-            ADD(temp_reg, EMU_THUNK_REG,THUNK_FUNCS_OFFSET(read_16_func));
-            break;
-        case 32:
-            ADD(temp_reg, EMU_THUNK_REG,THUNK_FUNCS_OFFSET(read_32_func));
-            break;
-        case 64:
-            ADD(temp_reg, EMU_THUNK_REG,THUNK_FUNCS_OFFSET(read_64_func));
-            break;
-        case 128:
-            ADD(temp_reg, EMU_THUNK_REG,THUNK_FUNCS_OFFSET(read_128_func));
-            break;
-    }
-
-    BLR(temp_reg);
-
-    //at this point, W0 has the value we want
-    // I don't have a load all function that will skip a certain register
-    // i.e. whatever register rt is... so just move it to the temp register
-    // then move from that
-
-    MOV(temp_reg, ARM64Reg::W0);
-
-    aarch64_load_all_mapped_regs();
-
-    MOV(rt, temp_reg);
-    return rt;
-}
-
-template <typename T>
-void rec_store()
-{
-    const int data_size = sizeof(T) * 8;
-
-    //TODO: some optimization can be done with immediates that are 12 bits or
-    //fewer, but those can come later and will really only be useful when we
-    //are doing reads and writes in the dynarec, rather than calling back into
-    //the aarch64 thunk
-    ARM64Reg base = aarch64_get_mapped_reg(op.base());
-    ARM64Reg rt = aarch64_get_mapped_reg(op.rt());
-    u32 imm = op.uimm16();
-
-    aarch64_flush_caller_saved_regs();
-
-    // at this point, all of the contexts have been flushed back
-    // so write and read to/from X0 - X7 with impunity in order
-    // to pass parameters
-
-    MOVZ(ARM64Reg::W0, imm);
-    SXTH(ARM64Reg::W0, ARM64Reg::W0);
-    ADD(ARM64Reg::W0, base, ARM64Reg::W0);
-    //TODO: resize rt? we may not have to. depends on how thunk funcs choose to write memory
-    MOV(ARM64Reg::W1, rt);
-
-    ARM64Reg temp_reg = aarch64_get_free_reg();
-
-    // This is a case we actually need to handle... not sure how though
-    // so until then just assert false and handle it when we run into it
-    assert(temp_reg != ARM64Reg::W0);
-    assert(temp_reg != ARM64Reg::W1);
-
-
-    switch(data_size)
-    {
-        case 8:
-            ADD(temp_reg, EMU_THUNK_REG,THUNK_FUNCS_OFFSET(write_8_func));
-            break;
-        case 16:
-            ADD(temp_reg, EMU_THUNK_REG,THUNK_FUNCS_OFFSET(write_16_func));
-            break;
-        case 32:
-            ADD(temp_reg, EMU_THUNK_REG,THUNK_FUNCS_OFFSET(write_32_func));
-            break;
-        case 64:
-            ADD(temp_reg, EMU_THUNK_REG,THUNK_FUNCS_OFFSET(write_64_func));
-            break;
-        case 128:
-            ADD(temp_reg, EMU_THUNK_REG,THUNK_FUNCS_OFFSET(write_128_func));
-            break;
-    }
-
-    BLR(temp_reg);
-
-    aarch64_load_all_mapped_regs();
 }
 
 void recLB(opcode_t op)
@@ -153,117 +35,117 @@ void recLB(opcode_t op)
     SXTB(rt,rt);
 }
 
-void recLBU()
+void recLBU(opcode_t op)
 {
     ARM64Reg rt = rec_load<u8>(op);
     UXTB(rt,rt); //todo: necessary?
 }
 
-void recLH()
+void recLH(opcode_t op)
 {
     ARM64Reg rt = rec_load<s16>(op);
     SXTH(rt,rt);
 }
 
-void recLHU()
+void recLHU(opcode_t op)
 {
     ARM64Reg rt = rec_load<u16>(op);
     UXTH(rt,rt); // todo: necessary?
 }
 
-void recLW()
+void recLW(opcode_t op)
 {
     ARM64Reg rt = rec_load<s32>(op);
     SXTW(rt,rt);
 }
 
-void recLWU()
+void recLWU(opcode_t op)
 {
     ARM64Reg rt = rec_load<u32>(op);
 }
 
-void recLD()
+void recLD(opcode_t op)
 {
     ARM64Reg rt = rec_load<u64>(op);
 }
 
-void recLQ()
+void recLQ(opcode_t op)
 {
 
 }
 
-void recSB()
+void recSB(opcode_t op)
 {
-    rec_store<u8>();
+    rec_store<u8>(op);
 }
-void recSH()
+void recSH(opcode_t op)
 {
-    rec_store<u16>();
-
-}
-void recSW()
-{
-    rec_store<u32>();
+    rec_store<u16>(op);
 
 }
-void recSQ()
+void recSW(opcode_t op)
 {
+    rec_store<u32>(op);
 
 }
-void recSD()
-{
-    rec_store<u64>();
-
-}
-
-
-void recLWL()
-{
-}
-
-void recLWR()
+void recSQ(opcode_t op)
 {
 
 }
-
-void recSWL()
+void recSD(opcode_t op)
 {
-}
+    rec_store<u64>(op);
 
-void recSWR()
-{
-}
-
-void recLDL()
-{
-}
-
-void recLDR()
-{
-}
-
-void recSDL()
-{
-}
-
-void recSDR()
-{
 }
 
 
-void recLWC1()
+void recLWL(opcode_t op)
 {
 }
 
-void recSWC1()
+void recLWR(opcode_t op)
+{
+
+}
+
+void recSWL(opcode_t op)
 {
 }
 
-void recLQC2()
+void recSWR(opcode_t op)
 {
 }
 
-void recSQC2()
+void recLDL(opcode_t op)
+{
+}
+
+void recLDR(opcode_t op)
+{
+}
+
+void recSDL(opcode_t op)
+{
+}
+
+void recSDR(opcode_t op)
+{
+}
+
+
+void recLWC1(opcode_t op)
+{
+}
+
+void recSWC1(opcode_t op)
+{
+}
+
+void recLQC2(opcode_t op)
+{
+}
+
+void recSQC2(opcode_t op)
 {
 }
 

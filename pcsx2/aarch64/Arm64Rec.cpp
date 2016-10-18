@@ -19,6 +19,7 @@
 #include "Arm64Reg.h"
 #include "R5900.h"
 #include "Memory.h"
+#include "../IopMem.h"
 
 using namespace Arm64Gen;
 
@@ -162,6 +163,9 @@ ARM64Reg aarch64_get_mapped_reg(mips_reg_e mips_reg)
 	return arm_reg;
 }
 
+// TODO: all of these need to keep track of 32/64 bit register getting passed in
+// we'll be using this for both IOP and EE and need to flush / load 32 or 64 bits
+// respectively
 void aarch64_load_from_mips_ctx(ARM64Reg arm_reg, mips_reg_e mips_reg)
 {
     LDR(INDEX_UNSIGNED, arm_reg, MIPS_CPU_CTX_REG, MIPS_CPU_CTX_REG(GPR.r[mips_reg]));
@@ -252,57 +256,55 @@ void aarch64_recompile_next_instr()
 }
 
 
-/*TODO: make all of this variadic templates and what not with this new fangled c++11 */
-
 typedef void(*thunk_func_f)();
 
-u8 thunk_mem_read_8(u32 addr)
+u8 thunk_ee_mem_read_8(u32 addr)
 {
     return memRead8(addr);
 }
-u16 thunk_mem_read_16(u32 addr)
+u16 thunk_ee_mem_read_16(u32 addr)
 {
     return memRead16(addr);
 }
-u32 thunk_mem_read_32(u32 addr)
+u32 thunk_ee_mem_read_32(u32 addr)
 {
     return memRead32(addr);
 }
-u64 thunk_mem_read_64(u32 addr)
+u64 thunk_ee_mem_read_64(u32 addr)
 {
     u64 temp;
     memRead64(addr, &temp);
     return temp;
 }
-u128 thunk_mem_read_128(u32 addr)
+u128 thunk_ee_mem_read_128(u32 addr)
 {
     u128 temp;
     memRead128(addr,&temp);
     return temp;
 }
 
-void thunk_mem_write_8(u32 addr, u8 data)
+void thunk_ee_mem_write_8(u32 addr, u8 data)
 {
     memWrite8(addr, data);
 }
-void thunk_mem_write_16(u32 addr, u16 data)
+void thunk_ee_mem_write_16(u32 addr, u16 data)
 {
     memWrite16(addr, data);
 }
-void thunk_mem_write_32(u32 addr, u32 data)
+void thunk_ee_mem_write_32(u32 addr, u32 data)
 {
     memWrite32(addr,data);
 }
-void thunk_mem_write_64(u32 addr, u64 data)
+void thunk_ee_mem_write_64(u32 addr, u64 data)
 {
     memWrite64(addr, data);
 }
-void thunk_mem_write_128(u32 addr, u128 data)
+void thunk_ee_mem_write_128(u32 addr, u128 data)
 {
     memWrite128(addr,data);
 }
 
-void thunk_interpret(opcode_t op)
+void thunk_ee_interpret(opcode_t op)
 {
     //TODO: is PC updated here? update PC here. Or update before
     u32 pc = cpuRegs.pc;
@@ -317,19 +319,64 @@ void thunk_interpret(opcode_t op)
     opcode.interpret();
 }
 
-
-
-const thunk_funcs_t aarch64_thunk_funcs =
+u8 thunk_iop_mem_read_8(u32 addr)
 {
-    thunk_mem_read_8,
-    thunk_mem_read_16,
-    thunk_mem_read_32,
-    thunk_mem_read_64,
-    thunk_mem_read_128,
-    thunk_mem_write_8,
-    thunk_mem_write_16,
-    thunk_mem_write_32,
-    thunk_mem_write_64,
-    thunk_mem_write_128,
-    thunk_interpret
+    return iopMemRead8(addr);
+}
+u16 thunk_iop_mem_read_16(u32 addr)
+{
+    return iopMemRead16(addr);
+}
+u32 thunk_iop_mem_read_32(u32 addr)
+{
+    return memRead32(addr);
+}
+
+void thunk_iop_mem_write_8(u32 addr, u8 data)
+{
+    iopMemWrite8(addr, data);
+}
+void thunk_iop_mem_write_16(u32 addr, u16 data)
+{
+    iopMemWrite16(addr, data);
+}
+void thunk_iop_mem_write_32(u32 addr, u32 data)
+{
+    iopMemWrite32(addr,data);
+}
+
+void thunk_iop_interpret(opcode_t op)
+{
+
+}
+
+const thunk_funcs_t ee_thunk_funcs =
+{
+    thunk_ee_mem_read_8,
+    thunk_ee_mem_read_16,
+    thunk_ee_mem_read_32,
+    thunk_ee_mem_read_64,
+    thunk_ee_mem_read_128,
+    thunk_ee_mem_write_8,
+    thunk_ee_mem_write_16,
+    thunk_ee_mem_write_32,
+    thunk_ee_mem_write_64,
+    thunk_ee_mem_write_128,
+    thunk_ee_interpret
 };
+
+const thunk_funcs_t iop_thunk_funcs =
+{
+    thunk_iop_mem_read_8,
+    thunk_iop_mem_read_16,
+    thunk_iop_mem_read_32,
+    nullptr,
+    nullptr,
+    thunk_iop_mem_write_8,
+    thunk_iop_mem_write_16,
+    thunk_iop_mem_write_32,
+    nullptr,
+    nullptr,
+    thunk_iop_interpret
+};
+
