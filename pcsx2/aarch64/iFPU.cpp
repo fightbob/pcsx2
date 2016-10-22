@@ -109,24 +109,61 @@ void recC_EQ(opcode_t op)
     ARM64Reg fs = neon_get_mapped_reg(op.fs());
     ARM64Reg fd = neon_get_mapped_reg(op.fd());
     ARM64Reg fcr31 = aarch64_get_free_reg(mips_reg_e::FCR31);
+    ARM64Reg temp_fcr31 = aarch64_get_free_reg();
     ARM64Reg temp_reg = aarch64_get_free_reg();
 
-    MOV(temp_reg,fcr31);
-    ORR(temp_reg,temp_reg,)
+    MOV(temp_fcr31,fcr31);
+    ORRI2R(temp_fcr31,temp_fcr31,1 << 23,temp_reg);
+    ANDI2R(fcr31,fcr31,~(1 << 23),temp_reg);
     FCMP(fd,fs);
+    CSEL(fcr31,temp_fcr31,fcr31,CC_EQ);
 
+    aarch64_free_reg(temp_fcr31);
+    aarch64_free_reg(temp_reg);
 }
 
 void recC_F(opcode_t op)
 {
+    ARM64Reg fcr31 = aarch64_get_free_reg(mips_reg_e::FCR31);
+    ARM64Reg temp_reg = aarch64_get_free_reg();
+    ANDI2R(fcr31,fcr31,~(1 << 23),temp_reg);
+    aarch64_free_reg(temp_reg);
 }
 
 void recC_LE(opcode_t op)
 {
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
+    ARM64Reg fcr31 = aarch64_get_free_reg(mips_reg_e::FCR31);
+    ARM64Reg temp_fcr31 = aarch64_get_free_reg();
+    ARM64Reg temp_reg = aarch64_get_free_reg();
+
+    MOV(temp_fcr31,fcr31);
+    ORRI2R(temp_fcr31,temp_fcr31,1 << 23,temp_reg);
+    ANDI2R(fcr31,fcr31,~(1 << 23),temp_reg);
+    FCMP(fd,fs);
+    CSEL(fcr31,temp_fcr31,fcr31,CC_LE);
+
+    aarch64_free_reg(temp_fcr31);
+    aarch64_free_reg(temp_reg);
 }
 
 void recC_LT(opcode_t op)
 {
+    ARM64Reg fs = neon_get_mapped_reg(op.fs());
+    ARM64Reg fd = neon_get_mapped_reg(op.fd());
+    ARM64Reg fcr31 = aarch64_get_free_reg(mips_reg_e::FCR31);
+    ARM64Reg temp_fcr31 = aarch64_get_free_reg();
+    ARM64Reg temp_reg = aarch64_get_free_reg();
+
+    MOV(temp_fcr31,fcr31);
+    ORRI2R(temp_fcr31,temp_fcr31,1 << 23,temp_reg);
+    ANDI2R(fcr31,fcr31,~(1 << 23),temp_reg);
+    FCMP(fd,fs);
+    CSEL(fcr31,temp_fcr31,fcr31,CC_LT);
+
+    aarch64_free_reg(temp_fcr31);
+    aarch64_free_reg(temp_reg);
 }
 void recCVT_S(opcode_t op)
 {
