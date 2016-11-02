@@ -16,7 +16,7 @@
 
 #include "PrecompiledHeader.h"
 #include "Arm64Emitter.h"
-#include "Arm64Reg.h"
+#include "Arm64Rec.h"
 #include "R5900.h"
 #include "Memory.h"
 #include "../IopMem.h"
@@ -26,51 +26,51 @@ using namespace Arm64Gen;
 
 const std::array<ARM64Reg,10> aarch64_callee_saved_regs =
 {
-  W19,
-  W20,
-  W21,
-  W22,
-  W23,
-  W24,
-  W25,
-  W26,
-  W27,
-  W28
+	ARM64Reg::W19,
+	ARM64Reg::W20,
+	ARM64Reg::W21,
+	ARM64Reg::W22,
+	ARM64Reg::W23,
+	ARM64Reg::W24,
+	ARM64Reg::W25,
+	ARM64Reg::W26,
+	ARM64Reg::W27,
+	ARM64Reg::W28
 };
 
 //LRU for keeping track of what register to allocate next
 std::deque<ARM64Reg> aarch64_reg_alloc_lru =
 {
-    W19,
-    W20,
-    W21,
-    W22,
-    W23,
-    W24,
-    W25,
-    W18,
-    W17,
-    W16,
-    W15,
-    W14,
-    W13,
-    W12,
-    W11,
-    W10,
-    W9,
-    W8,
-    W7,
-    W6,
-    W5,
-    W4,
-    W3,
-    W2,
-    W1,
-    W0
+	ARM64Reg::W19,
+	ARM64Reg::W20,
+	ARM64Reg::W21,
+	ARM64Reg::W22,
+	ARM64Reg::W23,
+	ARM64Reg::W24,
+	ARM64Reg::W25,
+	ARM64Reg::W18,
+	ARM64Reg::W17,
+	ARM64Reg::W16,
+	ARM64Reg::W15,
+	ARM64Reg::W14,
+	ARM64Reg::W13,
+	ARM64Reg::W12,
+	ARM64Reg::W11,
+	ARM64Reg::W10,
+	ARM64Reg::W9,
+	ARM64Reg::W8,
+	ARM64Reg::W7,
+	ARM64Reg::W6,
+	ARM64Reg::W5,
+	ARM64Reg::W4,
+	ARM64Reg::W3,
+	ARM64Reg::W2,
+	ARM64Reg::W1,
+	ARM64Reg::W0
 };
 
-std::map<Arm64Reg, mips_reg_e> aarch64_current_reg_mapping;
-std::map<Arm64Reg, reg_status_e> aarch64_current_reg_status;
+std::map<ARM64Reg, mips_reg_e> aarch64_current_reg_mapping;
+std::map<ARM64Reg, reg_status_e> aarch64_current_reg_status;
 
 constexpr bool aarch64_is_callee_saved_register(ARM64Reg reg)
 {
@@ -96,7 +96,7 @@ ARM64Reg aarch64_get_free_reg()
 {
     ARM64Reg arm_reg = aarch64_reg_alloc_lru.pop_front();
 
-    switch(aarch64_current_reg_status[reg])
+    switch(aarch64_current_reg_status[arm_reg])
     {
         case reg_status_e::UNUSED:
             aarch64_current_reg_status[arm_reg] = reg_status_e::USED;
@@ -112,7 +112,7 @@ ARM64Reg aarch64_get_free_reg()
     return arm_reg;
 }
 
-void aarch64_free_reg(ARM64Reg reg)
+void aarch64_free_reg(ARM64Reg arm_reg)
 {
     assert(aarch64_current_reg_status[arm_reg] == reg_status_e::USED);
 

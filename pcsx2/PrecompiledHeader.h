@@ -47,6 +47,7 @@
 #include <cstdlib>
 #include <cinttypes>	// Printf format
 #include <deque>
+#include <map>
 
 // ... and include some ANSI/POSIX C libs that are useful too, just for good measure.
 // (these compile lightning fast with or without PCH, but they never change so

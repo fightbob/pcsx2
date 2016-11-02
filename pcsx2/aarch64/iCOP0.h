@@ -13,15 +13,7 @@
  *  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __iCOP0_H__
-#define __iCOP0_H__
-
-#include "COP0.h"
-
-/*********************************************************
-*   COP0 opcodes                                         *
-*                                                        *
-*********************************************************/
+#pragma once
 
 namespace R5900 {
 namespace Dynarec {
@@ -43,4 +35,3 @@ namespace COP0
 	void recEI();
 
 }}}}
-#endif

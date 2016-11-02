@@ -7,10 +7,8 @@
 #include <cstring>
 #include <vector>
 
-#include "Common/Arm64Emitter.h"
-#include "Common/Assert.h"
-#include "Common/CommonTypes.h"
-#include "Common/MathUtil.h"
+#include "PrecompiledHeader.h"
+#include "Arm64Emitter.h"
 
 namespace Arm64Gen
 {
@@ -546,12 +544,12 @@ static void EncodeCompareBranchInst(u32 op, ARM64Reg Rt, const void* ptr)
   bool b64Bit = Is64Bit(Rt);
   s64 distance = (s64)ptr - (s64)m_code;
 
-  _assert_msg_(DYNA_REC, !(distance & 0x3), "%s: distance must be a multiple of 4: %lx",
+  assert( !(distance & 0x3), "%s: distance must be a multiple of 4: %lx",
                __FUNCTION__, distance);
 
   distance >>= 2;
 
-  _assert_msg_(DYNA_REC, distance >= -0x40000 && distance <= 0x3FFFF,
+  assert(distance >= -0x40000 && distance <= 0x3FFFF,
                "%s: Received too large distance: %lx", __FUNCTION__, distance);
 
   Rt = DecodeReg(Rt);
@@ -563,7 +561,7 @@ static void EncodeTestBranchInst(u32 op, ARM64Reg Rt, u8 bits, const void* ptr)
   bool b64Bit = Is64Bit(Rt);
   s64 distance = (s64)ptr - (s64)m_code;
 
-  _assert_msg_(DYNA_REC, !(distance & 0x3), "%s: distance must be a multiple of 4: %lx",
+  assert(!(distance & 0x3), "%s: distance must be a multiple of 4: %lx",
                __FUNCTION__, distance);
 
   distance >>= 2;

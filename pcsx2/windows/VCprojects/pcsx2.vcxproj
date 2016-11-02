@@ -151,6 +151,27 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\aarch64\Arm64Emitter.cpp" />
+    <ClCompile Include="..\..\aarch64\Arm64NeonRec.cpp" />
+    <ClCompile Include="..\..\aarch64\Arm64Rec.cpp" />
+    <ClCompile Include="..\..\aarch64\BaseblockEx.cpp" />
+    <ClCompile Include="..\..\aarch64\iCOP0.cpp" />
+    <ClCompile Include="..\..\aarch64\iFPU.cpp" />
+    <ClCompile Include="..\..\aarch64\iMMI.cpp" />
+    <ClCompile Include="..\..\aarch64\iR3000Atables.cpp" />
+    <ClCompile Include="..\..\aarch64\iR5900Arit.cpp" />
+    <ClCompile Include="..\..\aarch64\iR5900AritImm.cpp" />
+    <ClCompile Include="..\..\aarch64\iR5900Branch.cpp" />
+    <ClCompile Include="..\..\aarch64\iR5900Jump.cpp" />
+    <ClCompile Include="..\..\aarch64\iR5900LoadStore.cpp" />
+    <ClCompile Include="..\..\aarch64\iR5900Misc.cpp" />
+    <ClCompile Include="..\..\aarch64\iR5900Move.cpp" />
+    <ClCompile Include="..\..\aarch64\iR5900MultDiv.cpp" />
+    <ClCompile Include="..\..\aarch64\iR5900Shift.cpp" />
+    <ClCompile Include="..\..\aarch64\ir5900tables.cpp" />
+    <ClCompile Include="..\..\aarch64\newVif_Unpack.cpp" />
+    <ClCompile Include="..\..\aarch64\ps2_rec_common.cpp" />
+    <ClCompile Include="..\..\aarch64\recVTLB.cpp" />
     <ClCompile Include="..\..\CDVD\BlockdumpFileReader.cpp" />
     <ClCompile Include="..\..\CDVD\ChunksCache.cpp" />
     <ClCompile Include="..\..\CDVD\CompressedFileReader.cpp" />
@@ -413,6 +434,26 @@
     <ClCompile Include="..\Optimus.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\aarch64\Arm64Emitter.h" />
+    <ClInclude Include="..\..\aarch64\Arm64NeonRec.h" />
+    <ClInclude Include="..\..\aarch64\Arm64Rec.h" />
+    <ClInclude Include="..\..\aarch64\BaseblockEx.h" />
+    <ClInclude Include="..\..\aarch64\iCOP0.h" />
+    <ClInclude Include="..\..\aarch64\iFPU.h" />
+    <ClInclude Include="..\..\aarch64\iMMI.h" />
+    <ClInclude Include="..\..\aarch64\iR3000A.h" />
+    <ClInclude Include="..\..\aarch64\iR5900Arit.h" />
+    <ClInclude Include="..\..\aarch64\iR5900AritImm.h" />
+    <ClInclude Include="..\..\aarch64\iR5900Branch.h" />
+    <ClInclude Include="..\..\aarch64\iR5900Jump.h" />
+    <ClInclude Include="..\..\aarch64\iR5900LoadStore.h" />
+    <ClInclude Include="..\..\aarch64\iR5900Move.h" />
+    <ClInclude Include="..\..\aarch64\iR5900MultDiv.h" />
+    <ClInclude Include="..\..\aarch64\iR5900Shift.h" />
+    <ClInclude Include="..\..\aarch64\newVif.h" />
+    <ClInclude Include="..\..\aarch64\newVif_HashBucket.h" />
+    <ClInclude Include="..\..\aarch64\ps2_rec_common.h" />
+    <ClInclude Include="..\..\aarch64\R5900_Profiler.h" />
     <ClInclude Include="..\..\AsyncFileReader.h" />
     <ClInclude Include="..\..\CDVD\ChunksCache.h" />
     <ClInclude Include="..\..\CDVD\CompressedFileReader.h" />

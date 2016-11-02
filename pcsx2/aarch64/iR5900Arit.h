@@ -13,13 +13,7 @@
  *  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __IR5900ARIT_H__
-#define __IR5900ARIT_H__
-
-/*********************************************************
-* Register arithmetic                                    *
-* Format:  OP rd, rs, rt                                 *
-*********************************************************/
+#pragma once
 
 namespace R5900 {
 namespace Dynarec {
@@ -40,4 +34,3 @@ namespace OpcodeImpl
 	void recSLT();
 	void recSLTU();
 } } }
-#endif

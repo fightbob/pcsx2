@@ -13,9 +13,7 @@
  *  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __IFPU_H__
-#define __IFPU_H__
-
+#pragma once
 
 namespace R5900 {
 namespace Dynarec {
@@ -60,7 +58,4 @@ namespace Dynarec {
 		void recBC1TL();
 	} }
 } }
-
-#endif
-
 

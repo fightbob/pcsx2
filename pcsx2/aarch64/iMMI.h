@@ -13,13 +13,7 @@
  *  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//btw, nice box ya got there !
-/*********************************************************
-*   MMI opcodes                                          *
-*                                                        *
-*********************************************************/
-#ifndef __IMMI_H__
-#define __IMMI_H__
+#pragma once
 
 namespace R5900 {
 namespace Dynarec {
@@ -139,6 +133,4 @@ namespace MMI
 	void recPCPYH();
 
 } } } }
-
-#endif
 

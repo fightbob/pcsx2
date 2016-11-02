@@ -151,6 +151,9 @@
     <Filter Include="AppHost\Debugger">
       <UniqueIdentifier>{7a0a1104-f9ee-4cd1-aaba-f8267eba1658}</UniqueIdentifier>
     </Filter>
+    <Filter Include="System\Ps2\aarch64">
+      <UniqueIdentifier>{5d8b3653-7fee-4963-91ff-abb00af8881c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Utilities\folderdesc.txt">
@@ -874,6 +877,69 @@
     <ClCompile Include="..\..\IopGte.cpp">
       <Filter>System\Ps2\Iop</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\aarch64\Arm64Emitter.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\Arm64NeonRec.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\Arm64Rec.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\BaseblockEx.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iCOP0.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iFPU.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iMMI.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iR3000Atables.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iR5900Arit.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iR5900AritImm.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iR5900Branch.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iR5900Jump.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iR5900LoadStore.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iR5900Misc.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iR5900Move.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iR5900MultDiv.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\iR5900Shift.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\ir5900tables.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\newVif_Unpack.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\ps2_rec_common.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarch64\recVTLB.cpp">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Patch.h">
@@ -1307,6 +1373,66 @@
     </ClInclude>
     <ClInclude Include="..\..\IopGte.h">
       <Filter>System\Ps2\Iop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\Arm64Emitter.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\Arm64NeonRec.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\Arm64Rec.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\BaseblockEx.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\iCOP0.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\iFPU.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\iMMI.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\iR3000A.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\iR5900Arit.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\iR5900AritImm.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\iR5900Branch.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\iR5900Jump.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\iR5900LoadStore.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\iR5900Move.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\iR5900MultDiv.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\iR5900Shift.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\newVif.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\newVif_HashBucket.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\ps2_rec_common.h">
+      <Filter>System\Ps2\aarch64</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\aarch64\R5900_Profiler.h">
+      <Filter>System\Ps2\aarch64</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
